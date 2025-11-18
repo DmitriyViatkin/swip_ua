@@ -1,11 +1,11 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
-from .config import settings
+from src.core.infra.config.settings import get_infra_settings
 
-# Async engine для PostgreSQL
+
 engine = create_async_engine(
     settings.database_url,
-    echo=True,  # Для логов SQL-запросов
+    echo=True,
 )
 
 # Async sessionmaker
