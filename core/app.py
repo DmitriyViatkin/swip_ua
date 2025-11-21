@@ -2,6 +2,8 @@
 
 from core.config.settings import user_settings
 from core.infra.builder import FastAPIBuilder
+from src.users.router import router as users_router
+
 
 builder = FastAPIBuilder(
     title=user_settings.TITLE,
@@ -11,6 +13,7 @@ builder = FastAPIBuilder(
 
 app = builder.get_app()
 
+app.include_router(users_router)
 
 @app.get("/")
 async def root():
