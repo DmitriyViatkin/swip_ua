@@ -37,6 +37,6 @@ class UserService:
     async def delete_user(self, user_id: int) -> None:
         await self.repo.delete(user_id)
 
-    async def get_user_by_role (self, role: UserRole):
-        user = await self.repo.get_by_role(role)
+    async def get_user_by_role(self, role: UserRole):
+        users = await self.repo.get_by_role(role)
         return [UserRead.model_validate(u) for u in users]

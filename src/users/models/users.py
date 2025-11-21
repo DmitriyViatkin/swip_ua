@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.database import Base
 from src.enums import UserRole
+from src.advert.models.filters import Filter
 
 class User(Base):
     __tablename__ = "users"
@@ -14,7 +15,11 @@ class User(Base):
     email = Column(String(100), unique=True, index=True)
     role = Column(Enum(UserRole), default=UserRole.CLIENT)
     date = Column(DateTime, server_default=func.now())
-
+    houses = relationship(
+        "House",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
     client_notifications = relationship(
         "Notification",
         back_populates="client",
@@ -37,3 +42,16 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan"
         )
+    redirections = relationship(
+        "Redirections",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    # Якщо плануєш робити підписки
+    subscription = relationship(
+        "Subscription",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        uselist=False
+    )

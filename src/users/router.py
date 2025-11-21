@@ -10,8 +10,9 @@ from .routers.role_filter import router as role_filter_router
 router = APIRouter(prefix="/users", tags=["Users"])
 
 # Подключаем все подроутеры
-router.include_router(get_user_router)
+
 router.include_router(get_all_router)
+router.include_router(get_user_router)
 router.include_router(create_user_router)
 router.include_router(update_user_router)
 router.include_router(delete_user_router)

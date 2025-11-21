@@ -44,7 +44,7 @@ config.set_main_option("sqlalchemy.url", sync_url)
 from src.database import Base
 import src.users.models
 import src.building.models
-import src.listings.models
+import src.advert.models
 
 # --------------------------------------------------------------------
 # 6. Передаем meta Alembic

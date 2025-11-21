@@ -5,7 +5,7 @@ from core.infra.providers.redis import RedisProvider
 #from src.core.infra.providers.repositories import RepositoriesProvider
 from core.infra.config.settings import InfraSettings
 from dishka import make_async_container
-from src.core.user.providers import UserProviders  # если есть
+from core.infra.providers.user  import UserProvider
 
 # список провайдеров
 
@@ -13,7 +13,7 @@ container = make_async_container(
 
     PostgresProvider(),
     RedisProvider(),
-    UserProviders(),
+    UserProvider(),
     context={
         InfraSettings: infra_settings,
     }

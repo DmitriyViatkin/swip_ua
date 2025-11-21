@@ -25,7 +25,7 @@ async def init_db():
     # Импортируем все модели здесь
     import src.users.models
     import src.building.models
-    import src.listings.models
+    import src.advert.models
 
     engine = get_async_engine()
     async with engine.begin() as conn:

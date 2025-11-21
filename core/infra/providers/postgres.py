@@ -20,7 +20,7 @@ class PostgresProvider(Provider):
             autoflush=False,
             expire_on_commit=False,
         )
-    @provide(scope=Scope.APP)
+    @provide(scope=Scope.REQUEST)
     async def provide_session(self,
         session_maker: async_sessionmaker[AsyncSession]) -> AsyncIterable[AsyncSession]:
 

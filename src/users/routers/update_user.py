@@ -1,16 +1,17 @@
 from fastapi import APIRouter
-from dishka.integrations.fastapi import FromDishka
+from dishka.integrations.fastapi import FromDishka,inject
 
-from src.users.schemas.user_update import UserUpdateSchema
-from src.users.schemas.user_read import UserRead
+from src.users.schemas.user.user_update import UserUpdate
+from src.users.schemas.user.user_read import UserRead
 from src.users.services.user_service import UserService
 
 router = APIRouter()
 
-@router.put("/{user_id}", response_model=UserRead)
+@router.put("/update/{user_id}", response_model=UserRead)
+@inject
 async def update_user(
     user_id: int,
-    data: UserUpdateSchema,
-    service: UserService = FromDishka()
+    data: UserUpdate,
+    service: FromDishka[UserService]
 ):
     return await service.update_user(user_id, data)
