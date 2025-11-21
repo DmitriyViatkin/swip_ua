@@ -1,9 +1,9 @@
 from sqlalchemy import (Column, Integer, DateTime, Boolean, ForeignKey,
                         DECIMAL, String, Float)
 from sqlalchemy.orm import relationship
-from .models.riser import Riser
+from .riser import Riser
 from src.database import Base
-from .models.floor import Floor
+from .floor import Floor
 
 class Flat(Base):
     __tablename__ = "flats"

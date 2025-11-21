@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
 from src.database import Base
-from .models.section import Section
+from  .section import Section
 
 
 class Floor(Base):

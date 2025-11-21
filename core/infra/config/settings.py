@@ -1,29 +1,46 @@
 from typing import Any, ClassVar, Optional
 from pathlib import Path
 from functools import lru_cache
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv
 
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
+from sqlalchemy.pool import NullPool
+from sqlalchemy import event
+
+from dotenv import load_dotenv
+
 load_dotenv()
+# --- PATHS ---
+# Определяем корневую директорию проекта и путь к .env
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-# --- BASE CLASS ---
+ENV_PATH = BASE_DIR / "src" / ".env"
 
+# загружаем .env
+load_dotenv(ENV_PATH)
+
+
+# --- BASE CLASS WITH CORRECT ENV PATH ---
 class BaseInfraSettings(BaseSettings):
+
+    # Убедитесь, что ENV_PATH корректно указывает на .env
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ENV_PATH),
         env_file_encoding="utf-8",
-        extra="ignore"
+        extra="ignore",
     )
 
-    BASE_DIR: str = str(Path(__file__).resolve().parent.parent.parent.parent)
+    BASE_DIR: str = str(BASE_DIR)
 
 
 # --- REDIS SETTINGS ---
-
 class RedisSettings(BaseInfraSettings):
+
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ENV_PATH),
         env_file_encoding="utf-8",
         extra="ignore",
         env_prefix="REDIS_"
@@ -42,16 +59,10 @@ class RedisSettings(BaseInfraSettings):
 
 
 # --- DATABASE SETTINGS ---
-
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
-from sqlalchemy.pool import NullPool
-from sqlalchemy import event
-
-
 class DatabaseSettings(BaseInfraSettings):
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ENV_PATH),
         env_file_encoding="utf-8",
         extra="ignore",
         env_prefix="DB_"
@@ -76,11 +87,14 @@ class DatabaseSettings(BaseInfraSettings):
 
     @property
     def url(self) -> str:
+        """Postgres if все переменные определены, иначе SQLite."""
         if all([self.USER, self.PASSWORD, self.DB]):
             return (
                 f"postgresql+asyncpg://{self.USER}:{self.PASSWORD}@"
                 f"{self.HOST}:{self.PORT}/{self.DB}"
             )
+
+        # async SQLite
         return "sqlite+aiosqlite:///db.sqlite3"
 
     def _build_engine_params(self) -> dict[str, Any]:
@@ -93,7 +107,8 @@ class DatabaseSettings(BaseInfraSettings):
             "pool_pre_ping": self.POOL_PRE_PING,
         }
 
-        if not self.url.startswith("sqlite"):
+        # Пул не применяется к sqlite+aiosqlite
+        if self.url.startswith("postgres"):
             params.update(
                 pool_size=self.POOL_SIZE,
                 pool_timeout=self.POOL_TIMEOUT,
@@ -108,10 +123,6 @@ class DatabaseSettings(BaseInfraSettings):
 
         return params
 
-    @property
-    def engine(self) -> AsyncEngine:
-        return self.get_engine()
-
     def get_engine(self) -> AsyncEngine:
         if self._engine_instance:
             return self._engine_instance
@@ -119,38 +130,34 @@ class DatabaseSettings(BaseInfraSettings):
         params = self._build_engine_params()
         engine = create_async_engine(**params)
 
-        if self.url.startswith("sqlite"):
-            @event.listens_for(engine.sync_engine, "connect")
-            def _connect(dbapi_connection, connection_record):
-                dbapi_connection.isolation_level = None
-
-            @event.listens_for(engine.sync_engine, "begin")
-            def _begin(dbapi_connection):
-                dbapi_connection.exec_driver_sql("BEGIN")
+        # ❗ УДАЛЕНО: фиксы для sync sqlite — они ломали aiosqlite
 
         self._engine_instance = engine
         return engine
 
+    @property
+    def engine(self) -> AsyncEngine:
+        return self.get_engine()
 
-# --- MAIN CONTAINER ---
 
+# --- MAIN STORED SETTINGS ---
 class InfraSettings(BaseInfraSettings):
     db: DatabaseSettings = Field(default_factory=DatabaseSettings)
     redis: RedisSettings = Field(default_factory=RedisSettings)
 
 
-# ❗ правильная единственная функция получения настроек
-@lru_cache
-def get_settings() -> InfraSettings:
-    return InfraSettings()
-
+# --- GLOBAL CONFIG SINGLETON ---
 @lru_cache
 def get_infra_settings() -> InfraSettings:
+    """Единственная функция для получения кэшированных настроек."""
     return InfraSettings()
 
-infra_settings = get_infra_settings()
-# экспортируем готовый объект
-infra_settings = get_settings()
 
+# --- ЭКСПОРТ ГОТОВЫХ К ИСПОЛЬЗОВАНИЮ ОБЪЕКТОВ ---
+
+# Вызовет get_infra_settings() один раз благодаря lru_cache
+infra_settings = get_infra_settings()
+
+# Экспортируем вложенные объекты для удобства
 database_settings = infra_settings.db
 redis_settings = infra_settings.redis

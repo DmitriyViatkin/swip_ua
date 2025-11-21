@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, Text, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from src.database import Base
-from .models.house import House
+from .house import (House)
 
 class News(Base):
     __tablename__ = "news"

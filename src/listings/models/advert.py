@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Text, Float, Boolean, ForeignKey
     Numeric, Table
 from sqlalchemy.orm import relationship
 from src.database import Base
-from src.core.enums import (
+from src.enums import (
     AppointmentEnum, LayoutEnum, StateEnum, HeatingEnum,
     PaymentPartyEnum, CommunicationPartyEnum
 )
@@ -37,8 +37,9 @@ class Advert(Base):
     price = Column(
         Numeric(precision=10, scale=2))
 
+    build_id = Column(Integer, ForeignKey("houses.id"), nullable=False)
 
-    build_id = Column(Integer, ForeignKey("builds.id"), nullable=False)
-    build = relationship("Build", back_populates="adverts")  # build:Build
+
+    build = relationship("House", back_populates="adverts")
 
     promotion = relationship("Promotion", back_populates="advert", uselist=False)

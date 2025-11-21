@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, Text, ForeignKey, String, DECIMAL, Boole
 from sqlalchemy.orm import relationship
 
 from src.database import Base
-from .models.house import House
+from .house import House
 
 
 class Advantages_of_Home(Base):

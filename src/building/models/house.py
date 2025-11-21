@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.database import Base
 
-from listings.models import Gallery
+from src.listings.models.gallery import Gallery
 
 
 class House(Base):
@@ -33,3 +33,5 @@ class House(Base):
     infrastructure = relationship(
         "Infrastructure", back_populates="house", uselist=False
     )
+    adverts = relationship("Advert", back_populates="build",
+                           cascade="all, delete-orphan")

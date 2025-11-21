@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Float, Enum, ForeignKey
 from sqlalchemy.orm import relationship
 
 from src.database import Base
-from src.core.infrastructure_enums import (
+from src.enums import (
     BuildingStatus, BuildingType, HomeClass, ConstructionTechnology,
     TerritoryChoice, GasChoice, HeatingChoice, SewerageChoice,
     WaterSupplyChoice, UtilityBillsChoice

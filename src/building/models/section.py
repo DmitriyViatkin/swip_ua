@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from src.database import Base
-from .models.corps import Corps
+from  .corps import Corps
 
 class Section(Base):
     __tablename__ = "sections"

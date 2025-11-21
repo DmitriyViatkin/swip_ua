@@ -1,8 +1,10 @@
-from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey, String
+
+
 from sqlalchemy.orm import relationship
 
 from src.database import Base
-from .models.house import House
+from .house import House
 
 class Corps(Base):
     __tablename__ = "corps"

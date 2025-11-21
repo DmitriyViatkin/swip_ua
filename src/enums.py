@@ -141,3 +141,24 @@ class FinishingEnum(StrEnum):
     ROUGH = "Черновая"
     FINISHED = "Готова"
     OPTION_3 = "3"
+
+class StatusBuildEnum(StrEnum):
+    """Статус строительства (ранее StateEnum)."""
+    HANDED_OVER = "handed over"  # Сдан
+    PIT = "pit"                  # Котлован
+
+class BuildTypeEnum(StrEnum):
+    """Тип строения (ранее BuildingType)."""
+    APARTMENT_BUILDING = "apartment_building"
+    PRIVATE_HOUSE = "private_house"
+
+class PaymentEnum(StrEnum):
+    """Способы оплаты (добавлен, так как его не было)."""
+    CASH = "cash"
+    MORTGAGE = "mortgage"
+    INSTALLMENT = "installment"
+    MATERNAL_CAPITAL = "maternal_capital"
+
+class UtilityBillsChoice(StrEnum):
+    FIXED = "fixed"
+    BY_METER = "by_meter"

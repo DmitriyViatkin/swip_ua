@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, Text, ForeignKey, String, DECIMAL
 from sqlalchemy.orm import relationship
 
 from src.database import Base
-from .models.house import House
+from  .house import House
 
 class Registration_and_Payment(Base):
     __tablename__ = "registrations_and_payments"

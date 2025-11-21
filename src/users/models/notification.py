@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
 from src.database import Base
-from .models.users import User
+from .users import User
 
 class Notification (Base):
     __tablename__ = "notifications"

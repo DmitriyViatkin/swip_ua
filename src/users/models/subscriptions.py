@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.database import Base
-from .models.users import User
+from .users import User
 
 class Subscription (Base):
     __tablename__ = "subscriptions"

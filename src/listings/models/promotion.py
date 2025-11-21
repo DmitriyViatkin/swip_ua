@@ -1,9 +1,10 @@
-from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey,Text
+from sqlalchemy import Column, Integer, DateTime, Boolean, ForeignKey, Text, Enum
 from sqlalchemy.orm import relationship
 
 from src.database import Base
 from .advert import Advert
 from src.enums import TypeEnum
+
 
 class Promotion(Base):
     __tablename__ = "promotions"
@@ -12,8 +13,7 @@ class Promotion(Base):
     add_frase = Column(Text)
     is_color = Column(Boolean, default=False)
     is_big_advert = Column(Boolean, default=False)
-    type_promotion = Column(Enum(TypeEnum))
+    type_promotion = Column(Enum(TypeEnum))  # ✅ SQLAlchemy Enum
 
     advert_id = Column(Integer, ForeignKey("adverts.id"))
-
     advert = relationship("Advert", back_populates="promotion")
