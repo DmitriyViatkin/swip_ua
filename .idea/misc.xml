@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.12 (Swip_ua)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (FastAPIProject)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (swip_ua)" project-jdk-type="Python SDK" />
 </project>
