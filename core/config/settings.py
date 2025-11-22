@@ -18,8 +18,8 @@ class UserSettings(BaseInfraSettings):
         extra="ignore",
     )
 
-    TITLE: str = "User Service"
-    DESCRIPTION: str = "FastAPI app for User Service"
+    TITLE: str = "Swipe"
+    DESCRIPTION: str = "FastAPI app for Swipe"
 
 
     infra: InfraSettings = Field(default_factory=get_infra_settings)
