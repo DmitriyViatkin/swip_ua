@@ -5,7 +5,7 @@ from collections.abc import AsyncIterable
 from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from core.infra.config.settings import InfraSettings, infra_settings
+from config.infra.config.settings import InfraSettings, infra_settings
 
 class PostgresProvider(Provider):
     """ Provider class for postgres. """

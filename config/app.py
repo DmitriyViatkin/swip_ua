@@ -1,7 +1,7 @@
 
 
-from core.config.settings import user_settings
-from core.infra.builder import FastAPIBuilder
+from config.config.settings import user_settings
+from config.infra.builder import FastAPIBuilder
 from src.users.router import router as users_router
 
 

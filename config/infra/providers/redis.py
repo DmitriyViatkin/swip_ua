@@ -6,7 +6,7 @@ from collections.abc import AsyncIterable
 from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from redis.asyncio import Redis
-from core.infra.config.settings import InfraSettings, infra_settings
+from config.infra.config.settings import InfraSettings, infra_settings
 
 class RedisProvider(Provider):
     """ Provider class for Redis. """

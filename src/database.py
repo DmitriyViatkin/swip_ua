@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
-from core.infra.config.settings import get_infra_settings
+from config.infra.config.settings import get_infra_settings
 from typing import AsyncGenerator
 
 Base = declarative_base()  # <- только Base

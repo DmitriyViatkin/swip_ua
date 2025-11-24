@@ -1,11 +1,11 @@
 """ Main dependens """
-from core.infra.config.settings import infra_settings
-from core.infra.providers.postgres import PostgresProvider
-from core.infra.providers.redis import RedisProvider
+from config.infra.config.settings import infra_settings
+from config.infra.providers.postgres import PostgresProvider
+from config.infra.providers.redis import RedisProvider
 #from src.core.infra.providers.repositories import RepositoriesProvider
-from core.infra.config.settings import InfraSettings
+from config.infra.config.settings import InfraSettings
 from dishka import make_async_container
-from core.infra.providers.user  import UserProvider
+from config.infra.providers.user  import UserProvider
 
 # список провайдеров
 

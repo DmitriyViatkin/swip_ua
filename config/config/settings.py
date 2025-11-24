@@ -6,7 +6,7 @@ from typing import ClassVar
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from core.infra.config.settings import (BaseInfraSettings, InfraSettings,
+from config.infra.config.settings import (BaseInfraSettings, InfraSettings,
                                       get_infra_settings)
 
 

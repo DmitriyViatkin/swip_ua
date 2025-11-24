@@ -42,5 +42,5 @@ class FastAPIBuilder:
 
     def register_di_container(self) -> None:
         """Inject dependencies into FastAPI"""
-        from core.ioc import container
+        from config.ioc import container
         setup_dishka(container=container, app=self.app)
