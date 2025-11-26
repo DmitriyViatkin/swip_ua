@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 
 from .routers.get_user import router as get_user_router
+from .routers.create_notification import router as create_notification_router
+from .routers.update_notification import router as update_notification_router
 from .routers.get_all import router as get_all_router
 from .routers.create_user import router as create_user_router
 from .routers.update_user import router as update_user_router
@@ -13,7 +15,12 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 router.include_router(get_all_router)
 router.include_router(get_user_router)
+
 router.include_router(create_user_router)
+router.include_router(create_notification_router)
+
 router.include_router(update_user_router)
+router.include_router(update_notification_router)
+
 router.include_router(delete_user_router)
 router.include_router(role_filter_router)

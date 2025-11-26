@@ -8,7 +8,7 @@ from src.users.services.user_service import UserService
 class UserProvider(Provider):
     """DI provider for user module."""
 
-    scope = Scope.REQUEST  # всё на запрос
+    scope = Scope.REQUEST
 
     @provide
     def user_repository(self, session: AsyncSession) -> UserRepository:
