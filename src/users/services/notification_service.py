@@ -18,10 +18,11 @@ class NotificationService:
 
         if not notification:
             return None
-        return  NotificationrRead.model_validate(notification)
+        return  NotificationRead.model_validate(notification)
+
     async def create_notification (self, data:NotificationCreate) -> NotificationRead:
         notification = await self.repo.create(**data.model_damp())
-        return NotificationrRead.model_validate(notification)
+        return NotificationRead.model_validate(notification)
 
     async def update_notification (self, notification_id: int, data: NotificationUpdate) -> Optional[
         NotificationRead]:
@@ -29,7 +30,7 @@ class NotificationService:
         notification = await self.repo.update(notification_id, **data.model_dump(exclude_unset=True))
         if not notification:
             return None
-        return NotificationRead.model_validate(user)
+        return NotificationRead.model_validate(notification)
 
     async def delete_notification(self, notification_id: int) -> None:
         await self.repo.delete(notification_id)

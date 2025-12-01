@@ -19,7 +19,7 @@ fileConfig(config.config_file_name)
 # --------------------------------------------------------------------
 # 3. Настройки проекта
 # --------------------------------------------------------------------
-from core.infra.config.settings import get_infra_settings
+from config.infra.config.settings import get_infra_settings
 settings = get_infra_settings()
 
 # --------------------------------------------------------------------
