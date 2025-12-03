@@ -1,15 +1,15 @@
 """Provides a service for creating and decoding JWT access and refresh tokens."""
 
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from gettext import gettext as _
 from typing import Any
 
 import jwt
 from jwt.exceptions import DecodeError, ExpiredSignatureError, InvalidTokenError
 
-from src.main.config.settings import settings
-from src.main.features.auth.dtos.token import TokenPayloadDTO
+from config.config.settings import user_settings as settings
+from src.auth.shemas.token import TokenPayloadDTO
 
 
 class JWTService:
@@ -23,18 +23,25 @@ class JWTService:
         self.refresh_token_expire_days: int = settings.REFRESH_TOKEN_EXPIRE_DAYS
 
     def create_token(self, data: dict[str, Any], expires_delta: timedelta) -> str:
-        """Create a JWT token."""
-        to_encode: dict[str, Any] = data.copy()
-        expire: datetime = datetime.now(UTC) + expires_delta
-        to_encode.update({"exp": expire, "jti": str(uuid.uuid4())})
+        current_time: datetime = datetime.now(timezone.utc)
+        expire: datetime = current_time + expires_delta  # aware datetime UTC
+
+        to_encode = data.copy()
+        to_encode.update({
+            "exp": int(expire.timestamp()),  # передаем Unix timestamp (int)
+            "jti": str(uuid.uuid4()),
+        })
+
         encoded_jwt: str = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
+        print(f"Текущее время (UTC):  {current_time.isoformat()}")  # Вывод текущего времени
+        print(f"Время истечения (UTC): {expire.isoformat()}")
         return encoded_jwt
 
     def create_access_token(self, data: dict[str, Any]) -> str:
-        """Create an access token with a defined lifetime."""
-        data.update({"token_type": "access"})
+        data_copy = data.copy()
+        data_copy.update({"token_type": "access"})
         expires_delta: timedelta = timedelta(minutes=self.access_token_expire_minutes)
-        return self.create_token(data, expires_delta)
+        return self.create_token(data_copy, expires_delta)
 
     def create_refresh_token(self, data: dict[str, Any]) -> str:
         """Create a refresh token with a defined lifetime."""
@@ -43,9 +50,11 @@ class JWTService:
         return self.create_token(data, expires_delta)
 
     def decode_token(self, token: str) -> TokenPayloadDTO:
-        """Decode a JWT token and return its payload."""
         try:
+            now = datetime.now(timezone.utc)
+            print("Текущее время при декодировании (UTC):", now.isoformat())
             decoded_payload: dict[str, Any] = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            print("Расшифрованный payload токена:", decoded_payload)
             return TokenPayloadDTO(**decoded_payload)
         except ExpiredSignatureError as err:
             raise ExpiredSignatureError(_("Token has expired.")) from err

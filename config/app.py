@@ -3,7 +3,7 @@
 from config.config.settings import user_settings
 from config.infra.builder import FastAPIBuilder
 from src.users.router import router as users_router
-
+from src.auth.router import router as auth_router
 
 builder = FastAPIBuilder(
     title=user_settings.TITLE,
@@ -13,27 +13,11 @@ builder = FastAPIBuilder(
 
 app = builder.get_app()
 
+app.include_router(auth_router)
 app.include_router(users_router)
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
 
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
 
 
-"""app = FastAPI()
 
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
-"""

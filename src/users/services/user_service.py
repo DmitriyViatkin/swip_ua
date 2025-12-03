@@ -12,7 +12,7 @@ from src.users.schemas.user.user_read import UserRead
 from src.users.schemas.subscription.create import SubscriptionCreate
 from src.users.schemas.notification.create import NotificationCreate
 from src.users.schemas.redirections import RedirectionCreate
-
+from src.auth.security.password import hash_password
 from src.enums import UserRole
 
 
@@ -52,25 +52,25 @@ class UserService:
             redirections_data: Optional[List[RedirectionCreate]] = None,
     ) -> UserRead:
         data_dict = data.model_dump()
+
+        # Хешируем пароль перед сохранением
+        data_dict["password"] = hash_password(data_dict["password"])
+
         if agent_id:
             data_dict["agent_id"] = agent_id
 
-
         user = await self.user_repository.create(**data_dict)
 
-
         # Создаем подписку
-        #print('Создаем подписку')
         if subscription_data is None:
             subscription_data = SubscriptionCreate(user_id=user.id, auto_renewal=True)
         else:
             subscription_data.user_id = user.id
 
-        subscription = await self.subscription_repository.create(**subscription_data.model_dump())
+        await self.subscription_repository.create(**subscription_data.model_dump())
 
-
+        # Создаем уведомления
         if not notifications_data:
-
             default_notification = NotificationCreate(
                 client_id=None,
                 agent_id=None,
@@ -78,45 +78,31 @@ class UserService:
                 is_me_agent=False,
                 is_agent=False,
                 turn_off=False,
-                user_id=user.id
-            )
-            notification = await self.notification_repository.create(**default_notification.model_dump())
-
-        else:
-            for idx, n in enumerate(notifications_data):
-                notif_data = n.model_dump()
-                notif_data['user_id'] = user.id
-
-                notification = await self.notification_repository.create(**notif_data)
-
-
-
-        if not redirections_data:
-
-            default_redirection = RedirectionCreate(
                 user_id=user.id,
-
             )
-            redirection = await self.redirection_repository.create(**default_redirection.model_dump())
-
+            await self.notification_repository.create(**default_notification.model_dump())
         else:
-            for idx, r in enumerate(redirections_data):
+            for n in notifications_data:
+                notif_data = n.model_dump()
+                notif_data["user_id"] = user.id
+                await self.notification_repository.create(**notif_data)
+
+        # Создаем редиректы
+        if not redirections_data:
+            default_redirection = RedirectionCreate(user_id=user.id)
+            await self.redirection_repository.create(**default_redirection.model_dump())
+        else:
+            for r in redirections_data:
                 redir_data = r.model_dump()
-                redir_data['user_id'] = user.id
+                redir_data["user_id"] = user.id
+                await self.redirection_repository.create(**redir_data)
 
-                redirection = await self.redirection_repository.create(**redir_data)
-
-
-
+        # Обновляем и возвращаем пользователя с полным заполнением связей
         user = await self.user_repository.get_by_id(user.id)
         if not user:
-
             raise ValueError("User not found after creation")
 
-
-
         return UserRead.model_validate(user)
-
 
     async def update_user(self, user_id: int, data: UserUpdate) -> Optional[UserRead]:
         user = await self.user_repository.update(

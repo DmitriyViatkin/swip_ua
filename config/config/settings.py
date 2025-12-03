@@ -20,7 +20,10 @@ class UserSettings(BaseInfraSettings):
 
     TITLE: str = "Swipe"
     DESCRIPTION: str = "FastAPI app for Swipe"
-
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     infra: InfraSettings = Field(default_factory=get_infra_settings)
 

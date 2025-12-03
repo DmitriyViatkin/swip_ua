@@ -9,25 +9,24 @@ from src.users.repositories.redirection_repository import RedirectionRepository
 
 
 class UserProvider(Provider):
-    scope = Scope.REQUEST
 
-    @provide
+    @provide(scope=Scope.REQUEST)
     def user_repository(self, session: AsyncSession) -> UserRepository:
         return UserRepository(session)
 
-    @provide
+    @provide(scope=Scope.REQUEST)
     def subscription_repository(self, session: AsyncSession) -> SubscriptionRepository:
         return SubscriptionRepository(session)
 
-    @provide
+    @provide(scope=Scope.REQUEST)
     def notification_repository(self, session: AsyncSession) -> NotificationRepository:
         return NotificationRepository(session)
 
-    @provide
+    @provide(scope=Scope.REQUEST)
     def redirection_repository(self, session: AsyncSession) -> RedirectionRepository:
         return RedirectionRepository(session)
 
-    @provide
+    @provide(scope=Scope.REQUEST)
     def user_service(
         self,
         user_repository: UserRepository,

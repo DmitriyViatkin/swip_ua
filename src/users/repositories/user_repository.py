@@ -2,7 +2,7 @@ from typing import Optional, List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
 from sqlalchemy.orm import selectinload
-
+from sqlalchemy import select, update, delete, or_
 from src.users.models import User
 from src.enums import UserRole
 
@@ -66,3 +66,16 @@ class UserRepository:
         stmt = delete(User).where(User.id == user_id)
         await self.session.execute(stmt)
         await self.session.commit()
+
+    async def get_by_email_or_phone(self, login: str) -> Optional[User]:
+        stmt = (
+            select(User)
+            .options(
+                selectinload(User.subscription),
+                selectinload(User.clients),
+                # якщо треба, додай ще інші зв’язки
+            )
+            .where((User.email == login) | (User.phone == login))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
