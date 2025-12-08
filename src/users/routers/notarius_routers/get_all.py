@@ -13,9 +13,9 @@ from src.users.models.users import User
 bearer_scheme = HTTPBearer()
 router = APIRouter()
 
-@router.get("/", response_model=List[UserRead])
+@router.get("/notary", response_model=List[UserRead])
 @inject
-async def get_all_users(
+async def get_all_notary(
     current_user: User = Depends(get_current_user),
     user_service: FromDishka[UserService] = Depends(),
 ):

@@ -1,19 +1,25 @@
-from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from dishka.integrations.fastapi import FromDishka, inject
-
 from src.auth.services.auth_service import AuthService
-from config.infra.providers.auth_provider import AuthProvider
 
 router = APIRouter()
 
-@router.post("/token")
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+@router.post("/login")
 @inject
 async def login(
-    service: FromDishka[AuthService],
-    form_data: OAuth2PasswordRequestForm = Depends(),
-
+        request: LoginRequest,
+        service: FromDishka[AuthService],
 ):
-    user = await service.authenticate(form_data.username, form_data.password)
+    user = await service.authenticate(request.username, request.password)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+
     tokens = service.create_tokens(user)
     return tokens

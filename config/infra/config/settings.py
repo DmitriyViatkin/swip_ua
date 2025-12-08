@@ -47,7 +47,7 @@ class RedisSettings(BaseInfraSettings):
     )
 
     HOST: str = "localhost"
-    PORT: int = 6377
+    PORT: int = 6379
     PASSWORD: Optional[str] = None
     DB: int = 0
 
@@ -139,11 +139,48 @@ class DatabaseSettings(BaseInfraSettings):
     def engine(self) -> AsyncEngine:
         return self.get_engine()
 
+class CelerySettings(BaseInfraSettings):
+    model_config = {
+        "env_file": str(ENV_PATH),
+        "env_file_encoding": "utf-8",
+        "extra": "ignore",
+        "env_prefix": "CELERY_",
+    }
+
+    BROKER_URL: str = "redis://localhost:6379/0"
+    RESULT_BACKEND: str = "redis://localhost:6379/1"
+    TASK_SERIALIZER: str = "json"
+    RESULT_SERIALIZER: str = "json"
+    ACCEPT_CONTENT: list[str] = ["json"]
+    TIMEZONE: str = "UTC"
+    ENABLE_UTC: bool = True
+
+
+
+
+class SMTPSettings(BaseInfraSettings):
+    model_config = {
+        "env_file": str(ENV_PATH),
+        "env_file_encoding": "utf-8",
+        "extra": "ignore",
+        "env_prefix": "SMTP_",
+    }
+
+    HOST: str = "smtp.example.com"
+    PORT: int = 587
+    USER: Optional[str] = None
+    PASSWORD: Optional[str] = None
+    USE_TLS: bool = True
+    USE_SSL: bool = False
+    FROM_EMAIL: Optional[str] = None
+
 
 # --- MAIN STORED SETTINGS ---
 class InfraSettings(BaseInfraSettings):
     db: DatabaseSettings = Field(default_factory=DatabaseSettings)
     redis: RedisSettings = Field(default_factory=RedisSettings)
+    celery: CelerySettings = Field(default_factory=CelerySettings)
+    smtp: SMTPSettings = Field(default_factory=SMTPSettings)
 
 
 # --- GLOBAL CONFIG SINGLETON ---

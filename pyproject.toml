@@ -19,7 +19,7 @@ httpx = ">=0.27.0,<0.28.0"
 python-dotenv = ">=1.0.0,<2.0.0"
 dishka = "^1.7.2"
 pydantic-settings = "^2.12.0"
-redis = {extras = ["async"], version = "^7.0.1"}
+redis = "<5"
 aiosqlite = "^0.21.0"
 psycopg2-binary = "^2.9.11"
 pydantic = {extras = ["email"], version = "^2.12.4"}
@@ -29,6 +29,9 @@ pwdlib = {extras = ["argon2"], version = "^0.3.0"}
 passlib = "1.7.4"
 bcrypt = "4.0.1"
 python-multipart = "^0.0.20"
+celery = "5.3.6"
+aiosmtplib = "5.0.0"
+itsdangerous = "^2.2.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.0.0"

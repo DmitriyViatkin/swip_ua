@@ -9,7 +9,7 @@ import jwt
 from jwt.exceptions import DecodeError, ExpiredSignatureError, InvalidTokenError
 
 from config.config.settings import user_settings as settings
-from src.auth.shemas.token import TokenPayloadDTO
+from src.auth.schemas.token import TokenPayloadDTO
 
 
 class JWTService:

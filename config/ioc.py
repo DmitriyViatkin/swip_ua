@@ -11,6 +11,8 @@ from config.infra.providers.redirection import RedirectionProvider
 from config.infra.providers.notification  import NotificationProvider
 from config.infra.providers.subscription  import SubscriptionProvider
 from config.infra.providers.auth_provider  import AuthProvider
+from config.infra.providers.reset_password_provider  import PasswordResetServiceProvider
+
 
 
 container = make_async_container(
@@ -22,6 +24,7 @@ container = make_async_container(
     UserProvider(),
     AuthProvider(),
     NotificationProvider(),
+    PasswordResetServiceProvider(),
     context={
         InfraSettings: infra_settings,
     }
