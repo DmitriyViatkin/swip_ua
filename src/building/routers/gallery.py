@@ -8,6 +8,9 @@ from src.auth.dependencies import get_current_user
 from src.users.models.users import User
 from src.advert.services.gallery_serv import GalleryService
 from src.building.services.house import HouseService
+from src.advert.services.gallery_image_service import GalleryImageService
+
+from src.advert.services.gallery_serv import GalleryService
 
 router = APIRouter()
 
@@ -17,24 +20,26 @@ MEDIA_PATH = Path("media/houses")
 @inject
 async def upload_gallery_images(
     house_id: int,
-    current_user: User = Depends(get_current_user),
+    gallery_image_service: FromDishka[GalleryImageService],
+    gallery_service: FromDishka[GalleryService],
+    house_service: FromDishka[HouseService],
+    session: FromDishka[AsyncSession],
     files: List[UploadFile] = File(...),
-    session: FromDishka[AsyncSession] = Depends(),
-    gallery_service: FromDishka[GalleryService] = Depends(),
-    house_service: FromDishka[HouseService] = Depends(),
 ):
-
-    # Проверяем, что дом существует и принадлежит текущему пользователю
     house = await house_service.get_by_id(session, house_id)
     if not house:
         raise HTTPException(status_code=404, detail="House not found")
-    if house.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Forbidden")
 
-    if not files:
-        raise HTTPException(status_code=400, detail="No files uploaded")
+    # 🔥 создаём галерею, если её нет
+    if not house.gallery_id:
+        gallery = await gallery_service.create(session, {})
+        house.gallery_id = gallery.id
+        await session.flush()
 
-    # Создаем папку для дома, если еще нет
+    gallery = await gallery_service.get_by_id(session, house.gallery_id)
+    if not gallery:
+        raise HTTPException(status_code=404, detail="Gallery not found")
+
     house_dir = MEDIA_PATH / str(house_id)
     house_dir.mkdir(parents=True, exist_ok=True)
 
@@ -42,24 +47,26 @@ async def upload_gallery_images(
 
     for idx, file in enumerate(files):
         if file.content_type not in {"image/jpeg", "image/png", "image/webp"}:
-            raise HTTPException(status_code=400, detail=f"Unsupported image type: {file.filename}")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported image type: {file.filename}",
+            )
 
         filename = f"{idx}_{file.filename}"
         save_path = house_dir / filename
 
-        # Сохраняем файл
         with save_path.open("wb") as f:
             f.write(await file.read())
 
-        # Создаем запись в базе
-        image_record = await gallery_service.create(
-            session,
-            {
-                "image": str(save_path.relative_to(MEDIA_PATH.parent)),  # например, "media/houses/6/0_photo.jpg"
-                "is_main": idx == 0,  # первое фото - главное
-                "house_id": house_id,  # связь с домом
-            }
-        )
+        image_data = {
+            "image": str(save_path.relative_to(MEDIA_PATH.parent)),
+            "position": idx,
+            "is_main": idx == 0,
+            "gallery_id": gallery.id,
+        }
+
+        image_record = await gallery_image_service.create(session, image_data)
         created_images.append(image_record)
 
-    return created_images
+    return gallery
+

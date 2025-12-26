@@ -32,7 +32,9 @@ async def upload_gallery_images(
     if not advert:
         raise HTTPException(status_code=404, detail="Advert not found")
     if not advert.gallery_id:
-        raise HTTPException(status_code=400, detail="Advert has no gallery")
+        gallery = await gallery_service.create(session, {})
+        advert.gallery_id = gallery.id
+        await session.flush()
 
     gallery = await gallery_service.get_gallery_by_advert (session,advert_id)
     if not gallery:
