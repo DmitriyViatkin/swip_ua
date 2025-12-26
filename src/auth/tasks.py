@@ -1,7 +1,7 @@
 from email.message import EmailMessage
 import aiosmtplib
 import asyncio
-
+from src.auth.services.reset_password_service import RESET_PASSWORD_EXPIRE_HOURS
 from config.infra.config.settings import infra_settings
 from config.infra.utils.celery_app import celery_app
 
@@ -32,7 +32,19 @@ def send_email_task(to_email: str, subject: str, body: str):
 
     asyncio.run(_send())
 
+
 @celery_app.task
 def send_reset_password_email(email: str, token: str):
-    reset_link = f"http://frontend/reset-password?token={token}&email={email}"
-    print(f"Отправить ссылку для сброса пароля: {reset_link}")
+    # В идеале URL фронтенда должен быть в конфиге (settings.FRONTEND_URL)
+    frontend_url = "https://your-app.com/reset-password"
+    reset_link = f"{frontend_url}?token={token}"
+
+    subject = "Восстановление пароля"
+    body = f"""
+    Здравствуйте!
+    Для сброса пароля перейдите по ссылке: {reset_link}
+    Ссылка действительна в течение {RESET_PASSWORD_EXPIRE_HOURS} часа.
+    """
+
+    # Вызываем уже готовую задачу отправки почты
+    send_email_task.delay(to_email=email, subject=subject, body=body)

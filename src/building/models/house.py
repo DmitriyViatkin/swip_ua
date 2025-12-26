@@ -17,8 +17,8 @@ class House(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     user = relationship("User", back_populates="houses")
 
-    # gallery_id необов'язково, якщо ми хочемо зв'язок 1:1
-    gallery = relationship("Gallery", back_populates="house", uselist=False)
+    gallery_id = Column(Integer, ForeignKey("galleries.id"), nullable=True)
+    gallery = relationship("Gallery")
 
     corps = relationship("Corps", back_populates="house", cascade="all, delete-orphan")
     documents = relationship("Document", back_populates="house", cascade="all, delete-orphan")

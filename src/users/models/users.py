@@ -16,7 +16,7 @@ class User(Base):
     email = Column(String(100), unique=True, index=True)
     role = Column(Enum(UserRole), default=UserRole.CLIENT)
     date = Column(DateTime, server_default=func.now())
-
+    photo = Column(String(255), nullable=True)
 
     houses = relationship("House", back_populates="user", cascade="all, delete-orphan")
     client_notifications = relationship("Notification", back_populates="client", foreign_keys="[Notification.client_id]")

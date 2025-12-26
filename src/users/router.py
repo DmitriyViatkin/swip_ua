@@ -8,7 +8,7 @@ from .routers.get_all import router as get_all_router
 from .routers.redirection.update_redirection import router as up_redirection_router
 from .routers.subscription.update_subscription import router as up_subscription_router
 
-from .routers.create_user import router as create_user_router
+from .routers.upload_photo import router as upload_photo
 from .routers.update_user import router as update_user_router
 from .routers.delete_user import router as delete_user_router
 from .routers.role_filter import router as role_filter_router
@@ -20,7 +20,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
 router.include_router(get_all_router)
 router.include_router(get_user_router)
 
-#router.include_router(create_user_router)
+router.include_router(upload_photo)
 #router.include_router(create_notification_router)
 
 router.include_router(update_user_router)

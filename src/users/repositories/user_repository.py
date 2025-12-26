@@ -28,7 +28,7 @@ class UserRepository:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_all(self) -> List[User]:
+    async def get_all(self, role: Optional[str] = None) -> List[User]:
         stmt = (
             select(User)
             .options(
@@ -38,8 +38,11 @@ class UserRepository:
                 selectinload(User.client_notifications),
                 selectinload(User.redirections),
             )
-            .where(User.role == 'client')
         )
+
+        if role:
+            stmt = stmt.where(User.role == role)
+
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
@@ -98,4 +101,14 @@ class UserRepository:
         await self.session.execute(stmt)
         await self.session.commit()
 
+        return await self.get_by_id(user_id)
+
+    async def update_photo(self, user_id: int, filename: str) -> Optional[User]:
+        stmt = (
+            update(User)
+            .where(User.id == user_id)
+            .values(photo=filename)
+        )
+        await self.session.execute(stmt)
+        await self.session.commit()
         return await self.get_by_id(user_id)

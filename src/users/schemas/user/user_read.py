@@ -17,7 +17,7 @@ class UserRead(UserBase):
     subscription: Optional[SubscriptionRead] = None
     notification: Optional[NotificationRead] = None
     redirection: Optional[RedirectionRead] = None
-
+    photo: Optional[str]
     agent: Optional[UserAgentRead] = None
     clients: Optional[List["UserRead"]] = None
 

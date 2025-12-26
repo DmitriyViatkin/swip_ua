@@ -40,14 +40,14 @@ class JWTService:
     def create_access_token(self, data: dict[str, Any]) -> str:
         data_copy = data.copy()
         data_copy.update({"token_type": "access"})
-        expires_delta: timedelta = timedelta(minutes=self.access_token_expire_minutes)
+        expires_delta = timedelta(minutes=self.access_token_expire_minutes)
         return self.create_token(data_copy, expires_delta)
 
     def create_refresh_token(self, data: dict[str, Any]) -> str:
-        """Create a refresh token with a defined lifetime."""
-        data.update({"token_type": "refresh"})
-        expires_delta: timedelta = timedelta(days=self.refresh_token_expire_days)
-        return self.create_token(data, expires_delta)
+        data_copy = data.copy()  # ← КОПИЯ
+        data_copy.update({"token_type": "refresh"})
+        expires_delta = timedelta(days=self.refresh_token_expire_days)
+        return self.create_token(data_copy, expires_delta)
 
     def decode_token(self, token: str) -> TokenPayloadDTO:
         try:

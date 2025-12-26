@@ -14,6 +14,6 @@ router = APIRouter()
 @inject
 async def reset_password(
     data: PasswordResetConfirm,
-    service: FromDishka[PasswordResetService],   # <-- правильно!
+    service: FromDishka[PasswordResetService],
 ):
     return await service.reset_password(data.token, data.new_password)

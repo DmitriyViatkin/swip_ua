@@ -9,7 +9,7 @@ class UserBase(BaseModel):
     phone: Optional[str] = Field(None, max_length=20)
     email: Optional[EmailStr] = None
     role: UserRole = UserRole.CLIENT
-   # notification: "NotificationBase"
+    photo: Optional[str] = None
 
     model_config = ConfigDict(
         from_attributes=True,

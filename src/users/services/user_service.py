@@ -39,9 +39,8 @@ class UserService:
         return UserRead.model_validate(user)
 
 
-    async def get_all_users(self) -> List[UserRead]:
-        users = await self.user_repository.get_all()
-        return [UserRead.model_validate(u) for u in users]
+    async def get_all_users(self, role: Optional[str] = None):
+        return await self.user_repository.get_all(role)
 
     async def create_user(
             self,
@@ -122,3 +121,6 @@ class UserService:
     async def get_user_by_role(self, role: UserRole) -> List[UserRead]:
         users = await self.user_repository.get_by_role(role)
         return [UserRead.model_validate(u) for u in users]
+
+    async def update_user_photo(self, user_id: int, filename: str):
+        return await self.user_repository.update_photo(user_id, filename)
