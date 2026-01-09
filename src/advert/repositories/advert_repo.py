@@ -7,6 +7,7 @@ from .advert_base_repo import BaseRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from ..models.advert import Advert
+from ..models.gallery import Gallery
 from typing import Type
 from sqlalchemy.orm import selectinload
 
@@ -36,8 +37,24 @@ class AdvertRepository(BaseRepository[Advert]):
         await self.session.flush()
 
     async def get_by_id_with_gallery(self, advert_id: int) -> Advert | None:
-        stmt = select(Advert).where(Advert.id == advert_id).options(
-            selectinload(Advert.gallery)
+        stmt = (
+            select(Advert)
+            .where(Advert.id == advert_id)
+            .options(selectinload(Advert.gallery).selectinload(Gallery.images))
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def get_all(self):
+        stmt = (
+            select(Advert).where((Advert.is_approved == True) & (Advert.is_active == True)))
+
+
+
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+
+    #async def get_by_moderation(self, advert_id: int):
+
+        #stmt = select(Advert.is_moderation)

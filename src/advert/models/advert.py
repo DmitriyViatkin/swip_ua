@@ -36,6 +36,9 @@ class Advert(Base):
     description = Column(Text)
     price = Column(
         Numeric(precision=10, scale=2))
+    is_approved = Column(Boolean, default=False)
+
+    is_active = Column(Boolean, default=False)
     gallery_id = Column(Integer, ForeignKey("galleries.id"), nullable=True)
     gallery = relationship("Gallery")
 

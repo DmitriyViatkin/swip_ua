@@ -9,17 +9,19 @@ from src.auth.routers.password_request import router as password_request_router
 
 
 
-router = APIRouter(  tags=["Authorization"])
+router = APIRouter( prefix="/auth", tags=["Authorization"])
 
 
+
+
+
+router.include_router(authorization)
 
 router.include_router(request_email)
 
 router.include_router(verify_email)
 
-router.include_router(authorization)
-
-router.include_router(create_user_router)
+#router.include_router(create_user_router)
 
 router.include_router(password_request_router)
 

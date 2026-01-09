@@ -1,4 +1,5 @@
 from typing import List, Optional
+from fastapi import APIRouter, HTTPException
 
 from src.users.repositories.user_repository import UserRepository
 from src.users.repositories.subscriptions_repository import SubscriptionRepository
@@ -45,6 +46,7 @@ class UserService:
     async def create_user(
             self,
             data: UserCreateSchema,
+            role: UserRole = UserRole.CLIENT,
             agent_id: Optional[int] = None,
             subscription_data: Optional[SubscriptionCreate] = None,
             notifications_data: Optional[List[NotificationCreate]] = None,
@@ -52,23 +54,33 @@ class UserService:
     ) -> UserRead:
         data_dict = data.model_dump()
 
-        # Хешируем пароль перед сохранением
+        # Устанавливаем роль
+        data_dict["role"] = role
+
+        # Хешируем пароль
         data_dict["password"] = hash_password(data_dict["password"])
 
-        if agent_id:
+        # Привязка к агенту (если есть)
+        if agent_id is not None:
             data_dict["agent_id"] = agent_id
 
+        # Создаем пользователя
         user = await self.user_repository.create(**data_dict)
 
-        # Создаем подписку
+        # ───────────── Подписка ─────────────
         if subscription_data is None:
-            subscription_data = SubscriptionCreate(user_id=user.id, auto_renewal=True)
+            subscription_data = SubscriptionCreate(
+                user_id=user.id,
+                auto_renewal=True
+            )
         else:
             subscription_data.user_id = user.id
 
-        await self.subscription_repository.create(**subscription_data.model_dump())
+        await self.subscription_repository.create(
+            **subscription_data.model_dump()
+        )
 
-        # Создаем уведомления
+        # ───────────── Уведомления ─────────────
         if not notifications_data:
             default_notification = NotificationCreate(
                 client_id=None,
@@ -79,24 +91,28 @@ class UserService:
                 turn_off=False,
                 user_id=user.id,
             )
-            await self.notification_repository.create(**default_notification.model_dump())
+            await self.notification_repository.create(
+                **default_notification.model_dump()
+            )
         else:
-            for n in notifications_data:
-                notif_data = n.model_dump()
+            for notification in notifications_data:
+                notif_data = notification.model_dump()
                 notif_data["user_id"] = user.id
                 await self.notification_repository.create(**notif_data)
 
-        # Создаем редиректы
+        # ───────────── Редиректы ─────────────
         if not redirections_data:
             default_redirection = RedirectionCreate(user_id=user.id)
-            await self.redirection_repository.create(**default_redirection.model_dump())
+            await self.redirection_repository.create(
+                **default_redirection.model_dump()
+            )
         else:
-            for r in redirections_data:
-                redir_data = r.model_dump()
+            for redirection in redirections_data:
+                redir_data = redirection.model_dump()
                 redir_data["user_id"] = user.id
                 await self.redirection_repository.create(**redir_data)
 
-        # Обновляем и возвращаем пользователя с полным заполнением связей
+        # Загружаем пользователя со всеми связями
         user = await self.user_repository.get_by_id(user.id)
         if not user:
             raise ValueError("User not found after creation")
@@ -124,3 +140,22 @@ class UserService:
 
     async def update_user_photo(self, user_id: int, filename: str):
         return await self.user_repository.update_photo(user_id, filename)
+
+
+    async def email_verified(self, user_id : int):
+
+        user = await self.user_repository.verified_email(user_id)
+        if not user:
+            return None
+        return UserRead.model_validate(user)
+
+    async def check_user_before_code_request(self, email: str):
+        user = await self.user_repository.get_by_email(email)
+
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        if user.is_verified:
+            raise HTTPException(status_code=400, detail="Email already verified")
+
+        return user

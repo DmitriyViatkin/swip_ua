@@ -11,45 +11,36 @@ class GalleryService(BaseService[Gallery]):
     def __init__(self):
         super().__init__(GalleryRepository())
 
-    from src.advert.models.gallery import Gallery, GalleryImage
-
     async def add_image_to_advert(
             self,
             session: AsyncSession,
             advert_id: int,
             image_data: dict,
     ):
-        # Получаем или создаём галерею для объявления
-        result = await session.execute(
-            select(Gallery).where(Gallery.advert_id == advert_id)
-        )
-        gallery = result.scalar_one_or_none()
+        async with session.begin():  # открываем транзакцию
+            advert = await session.get(Advert, advert_id, options=[selectinload(Advert.gallery)])
+            if not advert:
+                raise Exception(f"Advert with id {advert_id} not found")
 
-        if not gallery:
-            gallery = Gallery(advert_id=advert_id)
-            session.add(gallery)
-            await session.commit()
-            await session.refresh(gallery)
+            gallery = advert.gallery
+            if not gallery:
+                gallery = Gallery()
+                session.add(gallery)
+                await session.flush()
+                advert.gallery_id = gallery.id
 
-        # Вычисляем позицию для нового изображения (нужно метод в репозитории)
-        position = await self.repository.get_next_position(
-            session=session,
-            gallery_id=gallery.id,
-        )
+            # Вычисляем позицию для нового изображения
+            position = await self.repository.get_next_position(session, gallery.id)
 
-        # Создаём новую запись изображения
-        gallery_image = GalleryImage(
-            gallery_id=gallery.id,
-            image=image_data["filename"],
-            position=position,
-            is_main=image_data.get("is_main", False),
-        )
-
-        session.add(gallery_image)
-        await session.commit()
-        await session.refresh(gallery_image)
-
-        return gallery_image
+            gallery_image = GalleryImage(
+                gallery_id=gallery.id,
+                image=image_data["filename"],
+                position=position,
+                is_main=image_data.get("is_main", False),
+            )
+            session.add(gallery_image)
+            await session.flush()
+            return gallery_image
 
     async def reorder_for_house(self, session: AsyncSession, house_id: int,
                                 items:list[GalleryOrder] ):
@@ -59,15 +50,10 @@ class GalleryService(BaseService[Gallery]):
                 items=items,
                 house_id=house_id
             )
-    async def reorder_for_advert(self, session:AsyncSession,
-                                 advert_id:int,items= list[GalleryOrder], ):
-        async with session.begin():
-            await self.repository.bulk_reorder(
-                session=session,
-                items=items,
-                advert_id=advert_id
 
-        )
+    async def reorder_for_advert(self, session: AsyncSession, advert_id: int, items: list[GalleryOrder]):
+        async with session.begin():  # открываем транзакцию
+            await self.repository.bulk_reorder(session=session, items=items)
 
     async def get_gallery_by_advert(self, session: AsyncSession, advert_id: int):
         result = await session.execute(

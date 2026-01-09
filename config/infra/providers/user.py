@@ -1,7 +1,9 @@
 from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.users.repositories.black_list_repo import BlackListRepo
 from src.users.repositories.user_repository import UserRepository
+from src.users.services.black_list_serv import BlackListService
 from src.users.services.user_service import UserService
 from src.users.repositories.subscriptions_repository import SubscriptionRepository
 from src.users.repositories.notification_repository import NotificationRepository
@@ -40,3 +42,10 @@ class UserProvider(Provider):
             notification_repository,
             redirection_repository,
         )
+
+    black_list_repo = provide(
+        BlackListRepo, scope=Scope.REQUEST
+    )
+    black_list_serv = provide(
+        BlackListService, scope=Scope.REQUEST
+    )

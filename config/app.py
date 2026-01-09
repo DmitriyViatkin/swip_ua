@@ -3,7 +3,7 @@
 from config.config.settings import user_settings
 from config.infra.builder import FastAPIBuilder
 from src.users.router import router as users_router
-from src.users.notary_routers import router as notary_router
+from src.users.admin_routers import router as notary_router
 from src.auth.router import router as auth_router
 from src.building.router import router as development_router
 from src.advert.router import router as adverts_router

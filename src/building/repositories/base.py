@@ -9,6 +9,7 @@ class BaseRepository(Generic[ModelType]):
     def __init__(self, model: Type[ModelType]):
         self.model = model
 
+
     async def get_all(self, session: AsyncSession):
         result = await session.execute(select(self.model))
         return result.scalars().all()

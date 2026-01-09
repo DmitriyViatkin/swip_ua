@@ -85,7 +85,7 @@ class UserRepository:
             .options(
                 selectinload(User.subscription),
                 selectinload(User.clients),
-                # якщо треба, додай ще інші зв’язки
+
             )
             .where((User.email == login) | (User.phone == login))
         )
@@ -112,3 +112,20 @@ class UserRepository:
         await self.session.execute(stmt)
         await self.session.commit()
         return await self.get_by_id(user_id)
+
+    async def verified_email(self, user_id:int)->Optional[User]:
+        """ Marks the user email as verified. """
+        stmt=(update(User).where(User.id == user_id).values(is_email_verified=True)
+              )
+        await self.session.execute(stmt)
+        await self.session.commit()
+        return await self.get_by_id(user_id)
+
+    async def is_email_verified(self, user_id: int) -> bool:
+        """Checks if the user's email is verified."""
+        stmt = (
+            select(User.is_email_verified)
+            .where(User.id == user_id)
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar() or False

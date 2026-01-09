@@ -10,11 +10,14 @@ class AdvertService:
         self.repo = AdvertRepository(session)
 
     async def get_by_id(self, advert_id: int):
-        return await self.repo.get_by_id(advert_id)
+        return await self.repo.get_by_id_with_gallery(advert_id)
 
     async def create(self, data: dict):
         advert = await self.repo.create(data)
         await self.session.commit()
+
+
+        advert = await self.repo.get_by_id_with_gallery(advert.id)
         return advert
 
     async def update(self, advert_id: int, data: dict):

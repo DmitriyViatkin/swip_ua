@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Enum, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Enum, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.database import Base
@@ -38,3 +38,4 @@ class User(Base):
         back_populates="agent",
         cascade="all, delete-orphan"
     )
+    is_email_verified = Column(Boolean, default=True)

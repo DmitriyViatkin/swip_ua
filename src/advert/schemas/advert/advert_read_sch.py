@@ -3,6 +3,8 @@
 from pydantic import BaseModel, ConfigDict
 from decimal import Decimal
 from typing import Optional
+from ..gallery_image_sch import GalleryImageRead
+from .. gallery_sch import GalleryRead
 from src.enums import (
     AppointmentEnum, LayoutEnum, StateEnum, HeatingEnum,
     PaymentPartyEnum, CommunicationPartyEnum
@@ -26,7 +28,7 @@ class AdvertRead(BaseModel):
     commission: Optional[Decimal]
     description: Optional[str]
     price: Decimal
-
+    gallery: GalleryRead | None
     build_id: int
 
     model_config = ConfigDict(from_attributes=True)

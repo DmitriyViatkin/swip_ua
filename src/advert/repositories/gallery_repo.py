@@ -13,7 +13,7 @@ class GalleryRepository(BaseRepository[Gallery]):
     def __init__(self):
         super().__init__(Gallery)
 
-        async def bulk_reorder(
+    async def bulk_reorder(
                 self,
                 session: AsyncSession,
                 items: list[GalleryOrder],
