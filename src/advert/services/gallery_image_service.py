@@ -16,7 +16,7 @@ class GalleryImageService(BaseService[GalleryImage]):
 
             image = GalleryImage(**data)
             session.add(image)
-            await session.commit()
+            await session.flush()
             await session.refresh(image)
             return image
 

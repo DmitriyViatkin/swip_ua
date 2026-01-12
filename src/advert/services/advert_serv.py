@@ -21,13 +21,14 @@ class AdvertService:
         return advert
 
     async def update(self, advert_id: int, data: dict):
-        advert = await self.repo.get_by_id(advert_id)
+        advert = await self.repo.get_by_id_with_gallery(advert_id)
         if not advert:
             raise ValueError("Advert not found")
 
         advert = await self.repo.update(advert, data)
-        await self.session.commit()
-        return advert
+        await self.session.flush()
+        return advert.id
+
 
     async def get_all(self):
         return await self.repo.get_all()

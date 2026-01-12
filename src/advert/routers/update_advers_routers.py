@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status,HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, status,HTTPException, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .gallery.replace_gallery_image import MEDIA_PATH
@@ -28,27 +28,25 @@ async def update_advert(
     gallery_image_service: FromDishka[GalleryImageService],
     gallery_service: FromDishka[GalleryService],
     data: AdvertUpdate = Depends(AdvertUpdate.as_form),
-    files: list[UploadFile] = File(default=[]),
+    files: list[UploadFile] = File(default=None),
     image_to_delete: Optional[list[int]] = None,
-    #order: Optional[list[GalleryOrder]] = None,
+    order: Optional[str] = Form(None),
 ):
     async with session.begin():
 
-        # 1️бновляем объявление
-        advert = await advert_service.update(
+        # 1️⃣ обновляем advert → получаем ID
+        advert_id = await advert_service.update(
             advert_id,
             data.model_dump(exclude_unset=True),
         )
 
-        if not advert:
+        if not advert_id:
             raise HTTPException(404, "Advert not found")
 
-        # 2️даление изображений
+        # 2️⃣ удаление изображений
         if image_to_delete:
             for image_id in image_to_delete:
-                image = await gallery_image_service.get_with_gallery(
-                    session, image_id
-                )
+                image = await gallery_image_service.get_with_gallery(session, image_id)
                 if not image:
                     continue
 
@@ -58,9 +56,9 @@ async def update_advert(
 
                 await session.delete(image)
 
-        # 3️добавление изображений
+        # 3️⃣ добавление изображений
         if files:
-            advert_dir = MEDIA_PATH / str(advert.id)
+            advert_dir = MEDIA_PATH / str(advert_id)
             advert_dir.mkdir(parents=True, exist_ok=True)
 
             for file in files:
@@ -77,23 +75,24 @@ async def update_advert(
 
                 await gallery_service.add_image_to_advert(
                     session=session,
-                    advert_id=advert.id,
+                    advert_id=advert_id,
                     image_data={
-                        "filename": str(
-                            save_path.relative_to(MEDIA_PATH.parent)
-                        ),
+                        "filename": str(save_path.relative_to(MEDIA_PATH.parent)),
                     },
                 )
+                order_items: Optional[List[GalleryOrder]] = None
+                if order:
+                    # конвертируем JSON-строку в список объектов GalleryOrder
+                    order_items = [GalleryOrder(**x) for x in json.loads(order)]
 
-        # 4️ reorder изображений
-        """
-        if order:
-            await gallery_image_service.reorder_for_advert(
-                session=session,
-                advert_id=advert.id,
-                items=order,
-            )
-        """
-    await session.refresh(advert)
+                # используем для перестановки
+                if order_items:
+                    await gallery_image_service.reorder_for_advert(
+                        session=session,
+                        advert_id=advert_id,
+                        items=order_items,
+                    )
+
+    advert = await advert_service.get_by_id(advert_id)
     return advert
 
