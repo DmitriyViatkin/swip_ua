@@ -1,13 +1,19 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException,status
 from dishka.integrations.fastapi import FromDishka, inject
 
 from src.users.schemas.black_list.create import BlackListCreate
 
-from src.users.services.black_list_serv import BlackListService
+from src.users.services.user_service import UserService
 
-router = APIRouter()
+router = APIRouter(tags=["Blacklist"])
 
-@router.post("/blacklist/remove/")
+@router.put("/blacklist/remove/")
 @inject
-async def remove_black_list (data: BlackListCreate, service: FromDishka[BlackListService]):
-    return await service.remove_from_blacklist(data.user_id)
+async def remove_from_black_list(data: BlackListCreate, service: FromDishka[UserService]):
+    result = await service.de_blocked_user(data.user_id)
+    if result is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id {data.user_id} not found"
+        )
+    return result

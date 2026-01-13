@@ -16,7 +16,7 @@ router = APIRouter()
 @router.get("/all_user", response_model=List[UserRead])
 @inject
 async def get_all_users(
-    current_user: User = Depends(get_current_user),
+   # current_user: User = Depends(get_current_user),
     user_service: FromDishka[UserService] = Depends(),
 ):
     return await user_service.get_all_users()

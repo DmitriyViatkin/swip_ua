@@ -17,10 +17,10 @@ router = APIRouter()
 @router.get("/all_users_from_blacklist", response_model=List[BlackListRead])
 @inject
 async def get_all_users(
-    current_user: User = Depends(get_current_user),
-    user_service: FromDishka[BlackListService] = Depends(),
+   # current_user: User = Depends(get_current_user),
+    user_service: FromDishka[UserService] = Depends(),
 ):
-    return await user_service.get_all_blocked_users()
+    return await user_service.get_blocked_user()
 
 
 

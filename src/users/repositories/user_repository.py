@@ -1,4 +1,6 @@
 from typing import Optional, List
+
+from mypy.stubgen import is_blacklisted_path
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
 from sqlalchemy import select, update, delete, or_
@@ -92,6 +94,14 @@ class UserRepository:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_blocked_user(self):
+
+        stmt = (select(User).where(User.is_blacklisted == True))
+        result = await self.session.execute(stmt)
+
+        return result.scalars().all()
+
+
     async def update_password(self, user_id: int, new_hashed_password: str) -> Optional[User]:
         stmt = (
             update(User)
@@ -129,3 +139,38 @@ class UserRepository:
         )
         result = await self.session.execute(stmt)
         return result.scalar() or False
+
+    async def blacked_user (self,user_id:int)-> bool:
+
+        """ Blocked User """
+        stmt = (
+            update(User)
+            .where(User.id == user_id)
+            .values(is_blacklisted=True)
+            .returning(User.is_blacklisted)
+        )
+
+        result = await self.session.execute(stmt)
+        await self.session.commit()
+
+
+        updated_status = result.scalar_one_or_none()
+
+
+        return updated_status if updated_status is not None else False
+
+    async def deblacked_user(self, user_id: int) -> bool:
+        """ Blocked User """
+        stmt = (
+            update(User)
+            .where(User.id == user_id)
+            .values(is_blacklisted=False)
+            .returning(User.is_blacklisted)
+        )
+
+        result = await self.session.execute(stmt)
+        await self.session.commit()
+
+        updated_status = result.scalar_one_or_none()
+
+        return updated_status if updated_status is not None else False

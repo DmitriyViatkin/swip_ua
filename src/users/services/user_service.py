@@ -43,6 +43,9 @@ class UserService:
     async def get_all_users(self, role: Optional[str] = None):
         return await self.user_repository.get_all(role)
 
+    async def get_blocked_user(self):
+        return await self.user_repository.get_by_blocked_user()
+
     async def create_user(
             self,
             data: UserCreateSchema,
@@ -54,10 +57,10 @@ class UserService:
     ) -> UserRead:
         data_dict = data.model_dump()
 
-        # Устанавливаем роль
+
         data_dict["role"] = role
 
-        # Хешируем пароль
+
         data_dict["password"] = hash_password(data_dict["password"])
 
         # Привязка к агенту (если есть)
@@ -148,6 +151,23 @@ class UserService:
         if not user:
             return None
         return UserRead.model_validate(user)
+
+    async def blocked_user(self, user_id: int):
+
+        success = await self.user_repository.blacked_user(user_id)
+        if success is None:
+            return None
+        return {"status": "success", "message": "User has been successfully blocked"}
+
+    async def de_blocked_user(self, user_id: int):
+
+        result = await self.user_repository.deblacked_user(user_id)
+
+
+        if result is None:
+            return None
+
+        return {"status": "success", "message": "User has been successfully unblocked"}
 
     async def check_user_before_code_request(self, email: str):
         user = await self.user_repository.get_by_email(email)

@@ -38,4 +38,6 @@ class User(Base):
         back_populates="agent",
         cascade="all, delete-orphan"
     )
-    is_email_verified = Column(Boolean, default=True)
+    is_email_verified = Column(Boolean, default=False)
+
+    is_blacklisted = Column(Boolean, default=False)
