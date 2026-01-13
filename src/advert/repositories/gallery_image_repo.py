@@ -40,22 +40,52 @@ class GalleryImageRepository(BaseRepository[GalleryImage]):
         return result.scalars().all()
 
     async def bulk_reorder(
-        self,
-        session: AsyncSession,
-        items: list[GalleryOrder],
+            self,
+            session: AsyncSession,
+            advert_id: int,
+            items: list[GalleryOrder],
     ):
-        if not items:
+        # 1. Получаем gallery_id
+        gallery_id_stmt = (
+            select(Gallery.id)
+            .join(Advert, Advert.gallery_id == Gallery.id)
+            .where(Advert.id == advert_id)
+        )
+
+        gallery_id = await session.scalar(gallery_id_stmt)
+
+        if not gallery_id:
+            raise ValueError("Gallery not found for advert")
+
+        # 2. Получаем ВСЕ изображения галереи в текущем порядке
+        images_stmt = (
+            select(GalleryImage)
+            .where(GalleryImage.gallery_id == gallery_id)
+            .order_by(GalleryImage.position)
+        )
+
+        images = (await session.execute(images_stmt)).scalars().all()
+
+        if not images:
             return
 
-        stmt = (
-            update(GalleryImage)
-            .where(GalleryImage.id.in_([i.id for i in items]))
-            .values(
-                position=case(
-                    {i.id: i.position for i in items},
-                    value=GalleryImage.id,
-                )
+        # 3. Формируем новый порядок
+        order_map = {item.id: item.position for item in items}
+
+        # сортируем:
+        # - те, что пришли — по position
+        # - остальные — в конец, сохраняя относительный порядок
+        images.sort(
+            key=lambda img: (
+                0 if img.id in order_map else 1,
+                order_map.get(img.id, img.position),
             )
         )
 
-        await session.execute(stmt)
+        # 4. Пересчитываем позиции с 0
+        for index, image in enumerate(images):
+            image.position = index
+            image.is_main = index == 0
+
+        await session.flush()
+

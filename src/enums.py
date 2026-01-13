@@ -71,19 +71,19 @@ class AppointmentEnum(str, Enum):
     STUDIO = "Студия"
 
 
-# Соответствует choises_layout
+
 class LayoutEnum(str, Enum):
     JOINT = "санузел+ туалет"
     SEPARATE = "Сан узел и туалет роздельно"
 
 
-# Соответствует choises_state (Состояние/стадия строительства)
+  #(Состояние/стадия строительства)
 class StateEnum(str, Enum):
     HANDED_OVER = "handed over"
     PIT = "pit"
 
 
-# Соответствует choises_heating
+
 class HeatingEnum(str, Enum):
     CENTRALIZED = "Централизованное"
     AUTONOMOUS = "Автономное"
