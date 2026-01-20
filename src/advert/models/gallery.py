@@ -22,3 +22,8 @@ class GalleryImage(Base):
     is_main = Column(Boolean, default=False, nullable=False)
 
     gallery = relationship("Gallery", back_populates="images")
+
+    @property
+    def image_url(self):
+        base_url = "https://your-domain.com/media/"
+        return base_url + self.image

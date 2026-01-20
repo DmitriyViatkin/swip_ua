@@ -13,7 +13,7 @@ class Promotion(Base):
     add_frase = Column(Text)
     is_color = Column(Boolean, default=False)
     is_big_advert = Column(Boolean, default=False)
-    type_promotion = Column(Enum(TypeEnum))  # ✅ SQLAlchemy Enum
+    type_promotion = Column(Enum(TypeEnum))
 
     advert_id = Column(Integer, ForeignKey("adverts.id"))
     advert = relationship("Advert", back_populates="promotion")

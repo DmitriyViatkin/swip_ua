@@ -57,7 +57,7 @@ class GalleryImageRepository(BaseRepository[GalleryImage]):
         if not gallery_id:
             raise ValueError("Gallery not found for advert")
 
-        # 2. Получаем ВСЕ изображения галереи в текущем порядке
+        # 2. Получаем все изображения галереи, отсортированные по позиции
         images_stmt = (
             select(GalleryImage)
             .where(GalleryImage.gallery_id == gallery_id)
@@ -69,23 +69,45 @@ class GalleryImageRepository(BaseRepository[GalleryImage]):
         if not images:
             return
 
-        # 3. Формируем новый порядок
+        # Карты позиций пользователя
         order_map = {item.id: item.position for item in items}
+        used_positions = set(order_map.values())
 
-        # сортируем:
-        # - те, что пришли — по position
-        # - остальные — в конец, сохраняя относительный порядок
-        images.sort(
-            key=lambda img: (
-                0 if img.id in order_map else 1,
-                order_map.get(img.id, img.position),
-            )
-        )
+        # Картинки с пользовательскими позициями
+        user_images = [img for img in images if img.id in order_map]
+        user_images.sort(key=lambda img: order_map[img.id])
 
-        # 4. Пересчитываем позиции с 0
-        for index, image in enumerate(images):
-            image.position = index
-            image.is_main = index == 0
+        # Картинки без указанных позиций
+        other_images = [img for img in images if img.id not in order_map]
+
+        # Функция для поиска свободной позиции, сдвигая вперёд при конфликтах
+        def find_next_free_position(start_pos, used_pos_set):
+            pos = start_pos
+            while pos in used_pos_set:
+                pos += 1
+            return pos
+
+        # Назначаем позиции пользовательским картинкам строго из order_map
+        for img in user_images:
+            img.position = order_map[img.id]
+            img.is_main = False
+
+        # Чтобы избежать конфликта, теперь для остальных картинок назначаем позиции:
+        # Если позиция у старой картинки конфликтует, сдвигаем вперёд до свободной
+        occupied_positions = set(order_map.values())
+
+        for img in other_images:
+            new_pos = find_next_free_position(img.position, occupied_positions)
+            img.position = new_pos
+            img.is_main = False
+            occupied_positions.add(new_pos)
+
+        # Назначаем is_main картинке с позицией 0
+        all_images = user_images + other_images
+        for img in all_images:
+            if img.position == 0:
+                img.is_main = True
+                break
 
         await session.flush()
 

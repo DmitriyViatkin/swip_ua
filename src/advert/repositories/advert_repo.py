@@ -22,6 +22,19 @@ class AdvertRepository(BaseRepository[Advert]):
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
+    async def get_by_id(self, advert_id: int) -> Advert | None:
+        stmt = (
+            select(Advert)
+            .where(Advert.id == advert_id)
+            .options(
+                selectinload(Advert.gallery)
+                .selectinload(Gallery.images),
+                selectinload(Advert.promotion),
+            )
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def exists(self, advert_id: int) -> bool:
         stmt = select(Advert.id).where(Advert.id == advert_id)
         result = await self.session.execute(stmt)
@@ -36,23 +49,43 @@ class AdvertRepository(BaseRepository[Advert]):
         await self.session.execute(stmt)
         await self.session.flush()
 
-    async def get_by_id_with_gallery(self, advert_id: int) -> Advert | None:
+    async def get_by_id_with_gallery(self, advert_id: int):
         stmt = (
             select(Advert)
+            .options(
+                selectinload(Advert.gallery),
+                selectinload(Advert.promotion),
+            )
             .where(Advert.id == advert_id)
-            .options(selectinload(Advert.gallery).selectinload(Gallery.images))
         )
         result = await self.session.execute(stmt)
-        return result.scalar_one_or_none()
+        return result.scalars().first()
 
     async def get_all(self):
         stmt = (
-            select(Advert).where((Advert.is_approved == True) & (Advert.is_active == True)))
-
-
+            select(Advert)
+            .where((Advert.is_approved == True) & (Advert.is_active == True))
+            .options(
+                selectinload(Advert.promotion),  # загружаем промо заранее
+                selectinload(Advert.gallery).selectinload(Gallery.images)  # галерея + картинки
+            )
+        )
 
         result = await self.session.execute(stmt)
         return result.scalars().all()
+
+    async def get_by_id(self, advert_id: int) -> Advert | None:
+        stmt = (
+            select(Advert)
+            .where(Advert.id == advert_id)
+            .options(
+                selectinload(Advert.promotion),
+                selectinload(Advert.gallery)
+                .selectinload(Gallery.images)
+            )
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
 
 
     #async def get_by_moderation(self, advert_id: int):

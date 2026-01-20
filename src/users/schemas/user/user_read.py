@@ -24,3 +24,9 @@ class UserRead(UserBase):
     model_config = {
         "from_attributes": True
     }
+
+class  UserList(BaseModel):
+    items: List[UserRead]
+
+    model_config = ConfigDict(from_attributes = True )
+

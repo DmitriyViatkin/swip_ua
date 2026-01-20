@@ -15,7 +15,7 @@ from config.infra.providers.reset_password_provider  import PasswordResetService
 from config.infra.providers.building_provider  import BuildingProvider
 from config.infra.providers.advert_provider import AdvertProvider
 from config.infra.providers.gallery_provider import GalleryProvider
-
+from config.infra.providers.promotion_provider import PromotionProviders
 
 container = make_async_container(
 
@@ -30,6 +30,7 @@ container = make_async_container(
     PasswordResetServiceProvider(),
     AdvertProvider(),
     GalleryProvider(),
+    PromotionProviders(),
     context={
         InfraSettings: infra_settings,
     }

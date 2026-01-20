@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import Optional
 from ..gallery_image_sch import GalleryImageRead
 from .. gallery_sch import GalleryRead
+from ..promotion.promotion_read_sch import PromotionRead
 from src.enums import (
     AppointmentEnum, LayoutEnum, StateEnum, HeatingEnum,
     PaymentPartyEnum, CommunicationPartyEnum
@@ -30,5 +31,6 @@ class AdvertRead(BaseModel):
     price: Decimal
     gallery: GalleryRead | None
     build_id: int
+    promotion: Optional[PromotionRead]
 
     model_config = ConfigDict(from_attributes=True)
