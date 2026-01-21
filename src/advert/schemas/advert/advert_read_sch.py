@@ -32,5 +32,8 @@ class AdvertRead(BaseModel):
     gallery: GalleryRead | None
     build_id: int
     promotion: Optional[PromotionRead]
+    is_approved: bool
+    is_active: bool
 
+    
     model_config = ConfigDict(from_attributes=True)

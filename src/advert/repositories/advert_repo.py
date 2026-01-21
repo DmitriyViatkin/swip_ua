@@ -88,6 +88,29 @@ class AdvertRepository(BaseRepository[Advert]):
         return result.scalar_one_or_none()
 
 
-    #async def get_by_moderation(self, advert_id: int):
+    async def moderation(self, advert_id: int, status: bool):
 
-        #stmt = select(Advert.is_moderation)
+        stmt = (update(Advert).where(Advert.id == advert_id).
+                values(is_active=status, is_approved=status))
+        await self.session.execute(stmt)
+        await self.session.flush()
+        return await self.get_by_id(advert_id)
+    async def activation(self, advert_id: int, status: bool):
+
+        stmt = (update(Advert).where(Advert.id == advert_id).
+                values(is_active=status))
+        await self.session.execute(stmt)
+        await self.session.flush()
+        return await self.get_by_id(advert_id)
+
+    async def get_by_moderation (self):
+        stmt = (
+            select(Advert)
+            .options(
+                selectinload(Advert.gallery).selectinload(Gallery.images),
+                selectinload(Advert.promotion),
+            )
+            .where(Advert.is_approved == False)
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()

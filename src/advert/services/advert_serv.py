@@ -40,21 +40,20 @@ class AdvertService:
 
         await self.session.commit()
 
-        # 🔥 обязательно перечитываем
+
         return await self.get_by_id(advert_id)
 
     @staticmethod
-    async def save_base64_image(base64_str: str, upload_dir: str = "uploads/advert/") -> str:
+    async def save_base64_image(base64_str: str, upload_dir: str = "media/advert/") -> str:
         # base64 строка может начинаться с "data:image/jpeg;base64,..."
         if "," in base64_str:
             header, base64_data = base64_str.split(",", 1)
         else:
             base64_data = base64_str
 
-        # Создаем папку, если нет
         os.makedirs(upload_dir, exist_ok=True)
 
-        # Генерируем уникальное имя файла (например, uuid + .jpg)
+
         filename = f"{uuid.uuid4().hex}.jpg"
         filepath = os.path.join(upload_dir, filename)
 
@@ -65,21 +64,21 @@ class AdvertService:
         with open(filepath, "wb") as f:
             f.write(image_bytes)
 
-        # Возвращаем путь, который можно сохранить в БД (например, относительный)
+
         return f"advert/{filename}"
 
     async def _apply_gallery_actions(self, advert: Advert,  images: list,    ):
         reorder_items: list[GalleryOrder] = []
 
         for image_action in images:
-            # delete
+
             if image_action.is_delete and image_action.image_id:
                 obj = await self.gallery_image_repo.get_by_id_with_gallery(self.session, image_action.image_id)
                 if obj:
                     await self.session.delete(obj)
                     await self.session.flush()
 
-            # reorder (копим, применяем один раз)
+
             if image_action.image_id and image_action.position is not None:
                 reorder_items.append(
                     GalleryOrder(
@@ -113,6 +112,42 @@ class AdvertService:
     async def get_all(self):
         return await self.repo.get_all()
 
+    async def moderation(self, advert_id: int):
+        advert = await self.repo.get_by_id(advert_id)
 
+        if not advert:
+            return None
+        advert = await self.repo.moderation(advert_id, status= True)
+        await self.session.commit ()
+        await self.session.refresh(advert)
+        return advert
+    async def unModeration(self, advert_id: int):
+        advert = await self.repo.get_by_id(advert_id)
 
+        if not advert:
+            return None
+        advert = await self.repo.moderation(advert_id, status=False)
+        await self.session.commit()
+        await self.session.refresh(advert)
+        return advert
+    async def get_ads_to_moderate(self):
+        return await self.repo.get_by_moderation()
+    async def activation(self, advert_id):
+        advert = await self.repo.get_by_id(advert_id)
 
+        if not advert:
+            return None
+        advert = await self.repo.activation(advert_id, status=True)
+        await self.session.commit()
+        await self.session.refresh(advert)
+        return advert
+
+    async def deactivation(self, advert_id):
+        advert = await self.repo.get_by_id(advert_id)
+
+        if not advert:
+            return None
+        advert = await self.repo.activation(advert_id, status=False)
+        await self.session.commit()
+        await self.session.refresh(advert)
+        return advert

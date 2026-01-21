@@ -1,16 +1,9 @@
 # gallery_sch.py
 from pydantic import BaseModel
 from typing import List
+from ..schemas.gallery_image_sch import GalleryImageRead
 
-class GalleryImageRead(BaseModel):
-    id: int
-    image: str
-    position: int
-    is_main: bool
 
-    model_config = {
-        "from_attributes": True
-    }
 
 class GalleryRead(BaseModel):
     id: int

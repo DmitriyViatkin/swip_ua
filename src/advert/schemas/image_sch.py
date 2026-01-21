@@ -1,8 +1,11 @@
 from typing import Optional, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field,computed_field
 from src.advert.schemas.advert.advert_update_sch import AdvertUpdate
 from src.advert.schemas.galery_order import GalleryOrder
 from src.advert.schemas.advert.advert_create_sch import AdvertCreate
+
+from config.config.settings import user_settings
+
 
 class ImageWithPosition(BaseModel):
     """Схема для загрузки картинки с указанием её позиции"""
@@ -19,16 +22,16 @@ class ImageWithPosition(BaseModel):
         False, description="Позначка для видалення"
     )
 
+
+
+
+
 class AdvertUpdateWithImages(AdvertUpdate):
     """Расширенная схема обновления объявления с изображениями"""
 
     images: Optional[List[ImageWithPosition]] = None
 
-class ImageWithPosition(BaseModel):
-    image_id: Optional[int] = None
-    base64: Optional[str] = None
-    position: Optional[int] = None
-    is_delete: bool = False
+
 
 class AdvertCreateWithImages(AdvertCreate):
     images: Optional[List[ImageWithPosition]] = None

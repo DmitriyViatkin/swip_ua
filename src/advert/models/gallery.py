@@ -1,5 +1,5 @@
 from src.database import Base
-
+from config.config.settings import user_settings
 from sqlalchemy import (
     Column, Integer, String, Boolean, ForeignKey, Index
 )
@@ -19,11 +19,11 @@ class GalleryImage(Base):
     gallery_id = Column(Integer, ForeignKey("galleries.id", ondelete="CASCADE"), nullable=False)
     image = Column(String(255), nullable=False)
     position = Column(Integer, nullable=False)
-    is_main = Column(Boolean, default=False, nullable=False)
+
 
     gallery = relationship("Gallery", back_populates="images")
 
     @property
     def image_url(self):
-        base_url = "https://your-domain.com/media/"
-        return base_url + self.image
+
+        return f"{user_settings.media_url}{self.image}"

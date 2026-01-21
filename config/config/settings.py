@@ -25,7 +25,16 @@ class UserSettings(BaseInfraSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    BASE_URL: str = Field(default="http://localhost:8000")
+    MEDIA_PREFIX: str = "/media/"
+
+    @property
+    def media_url(self) -> str:
+        
+        return f"{self.BASE_URL.rstrip('/')}{self.MEDIA_PREFIX}"
+
     infra: InfraSettings = Field(default_factory=get_infra_settings)
+
 
 
 @lru_cache

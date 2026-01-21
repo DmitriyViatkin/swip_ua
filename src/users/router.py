@@ -13,6 +13,7 @@ from .routers.update_user import router as update_user_router
 from .routers.delete_user import router as delete_user_router
 from .routers.role_filter import router as role_filter_router
 
+
 router = APIRouter(prefix="/users", tags=["Users"])
 
 # Подключаем все подроутеры
@@ -30,3 +31,4 @@ router.include_router(up_subscription_router)
 
 router.include_router(delete_user_router)
 router.include_router(role_filter_router)
+
