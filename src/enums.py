@@ -63,7 +63,6 @@ class UtilityBillsChoice(str, Enum):
     BY_METER = "by_meter"
 
 
-# Соответствует choises_appointment
 class AppointmentEnum(str, Enum):
     APARTMENTS = "Апартаменты"
     FLAT = "Квартира"

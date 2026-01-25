@@ -90,7 +90,7 @@ class GalleryImageRepository(BaseRepository[GalleryImage]):
         # Назначаем позиции пользовательским картинкам строго из order_map
         for img in user_images:
             img.position = order_map[img.id]
-            img.is_main = False
+
 
         # Чтобы избежать конфликта, теперь для остальных картинок назначаем позиции:
         # Если позиция у старой картинки конфликтует, сдвигаем вперёд до свободной
@@ -102,12 +102,7 @@ class GalleryImageRepository(BaseRepository[GalleryImage]):
             img.is_main = False
             occupied_positions.add(new_pos)
 
-        # Назначаем is_main картинке с позицией 0
-        all_images = user_images + other_images
-        for img in all_images:
-            if img.position == 0:
-                img.is_main = True
-                break
+
 
         await session.flush()
 

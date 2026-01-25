@@ -23,15 +23,15 @@ class Filter(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    # --- Связь с User (Один раз!) ---
+
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     user = relationship("User", back_populates="filters")
 
-    # --- Поля фильтров (Enums) ---
+
     housing_market = Column(Enum(HousingMarketEnum, name="housing_market_enum"),
                             nullable=True)
 
-    # Используем исправленный StatusBuildEnum (Сдан/Котлован)
+
     build_status = Column(Enum(StatusBuildEnum, name="build_status_enum"),
                           nullable=True)
 
@@ -41,25 +41,25 @@ class Filter(Base):
     microdistrict = Column(Enum(MicroDistrictEnum, name="microdistrict_enum"),
                            nullable=True)
 
-    # Используем исправленный BuildTypeEnum (Квартирный дом/Частный дом)
+
     type_build = Column(Enum(BuildTypeEnum, name="build_type_enum"),
                         nullable=True)
 
-    # Используем добавленный PaymentEnum
+
     payment = Column(Enum(PaymentEnum, name="payment_enum"),
                      nullable=True)
 
     finishing = Column(Enum(FinishingEnum, name="finishing_enum"),
                        nullable=True)
 
-    # Используем UtilityBillsChoice (как он назван в файле enums)
+
     utility_bills = Column(Enum(UtilityBillsChoice, name="utility_bills_enum"),
                            nullable=True)
 
-    # --- Числовые диапазоны ---
+
     rooms = Column(Integer, nullable=True)
 
-    # Numeric(12, 2) идеально для денег
+
     price_from = Column(Numeric(12, 2), nullable=True)
     price_to = Column(Numeric(12, 2), nullable=True)
 

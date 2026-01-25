@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from typing import ClassVar
+from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -26,6 +27,15 @@ class UserSettings(BaseInfraSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     BASE_URL: str = Field(default="http://localhost:8000")
+    BASE_DIR: Path = Field(
+        default_factory=lambda: Path(__file__).resolve().parents[2]
+    )
+
+    @property
+    def MEDIA_DIR(self) -> Path:
+        # Берем BASE_DIR из базового класса (корень проекта)
+        return Path(self.BASE_DIR) / "media"
+
     MEDIA_PREFIX: str = "/media/"
 
     @property

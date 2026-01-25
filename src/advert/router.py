@@ -7,7 +7,7 @@ from .routers.all_adverts_routers import router as all_advert
 from .routers.get_advert_by_id import router as advert_by_id
 from .routers.promotion_routers.promotion_create_rout import router as promotion_create
 from .routers.promotion_routers.promotion_update_rout import router as promotion_update
-
+from .routers.filters_routers.general_filter_routers import router as filters
 
 router=APIRouter(prefix="/adverts", tags=["Adverts"])
 
@@ -20,6 +20,4 @@ router.include_router(update_advert)
 router.include_router(delete_advert)
 router.include_router(promotion_create)
 router.include_router(promotion_update)
-
-
-
+router.include_router(filters)

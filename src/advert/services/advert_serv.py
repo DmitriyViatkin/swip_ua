@@ -16,6 +16,7 @@ class AdvertService:
         self.session = session
         self.repo = AdvertRepository(session)
 
+        self.gallery_image_repo = GalleryImageRepository()
     async def create(self, data: dict):
         advert = await self.repo.create(data)
         await self.session.commit()

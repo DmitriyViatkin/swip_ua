@@ -7,12 +7,14 @@ class GalleryImageRead(BaseModel):
     image: str
     position: int
 
-    @field_validator("image", mode= "after")
+    @field_validator("image", mode="after")
     @classmethod
-    def format_image_url(cls, v: str)->str:
-        """Подменяет относительный путь на полный URL в поле image"""
+    def format_image_url(cls, v: str) -> str:
         if v and not v.startswith(("http://", "https://")):
-            return f"{user_settings.media_url}{v}"
+            # Гарантируем правильную склейку
+            base = user_settings.media_url.rstrip("/")
+            path = v.lstrip("/")
+            return f"{base}/{path}"
         return v
 
 
