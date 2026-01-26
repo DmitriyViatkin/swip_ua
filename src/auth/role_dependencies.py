@@ -11,5 +11,9 @@ def require_roles(*allowed_roles: UserRole):
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав"
             )
+
+        # ---------------------
         return current_user
+
+    # ---------------------
     return role_checker

@@ -10,9 +10,9 @@ from src.auth.dependencies import get_current_user
 # Ось це визначення аліаса:
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
-router = APIRouter(  tags=["Filters"])
+router = APIRouter(  )
 
-@router.patch("/{filter_id}", response_model=FilterRead)
+@router.patch("/update/{filter_id}", response_model=FilterRead)
 @inject
 async def patch_filter(
     filter_id: int,

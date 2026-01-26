@@ -9,18 +9,29 @@ from fastapi import Depends
 from src.auth.dependencies import get_current_user
 # Ось це визначення аліаса:
 CurrentUser = Annotated[User, Depends(get_current_user)]
-router = APIRouter(tags=["Filters"])
+router = APIRouter( )
 
 
-@router.delete("/{filter_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{filter_id}/delete", status_code=status.HTTP_204_NO_CONTENT)
 @inject
 async def delete_filter(
-    filter_id: int,
-    service: FromDishka[FilterService],
-    #user: CurrentUser,
+        filter_id: int,
+        service: FromDishka[FilterService],
+        user: CurrentUser,
 ):
+
+    print(f"--- ROUTER DEBUG ---")
+    print(f"Target filter_id: {filter_id}")
+    print(f"Current user object: {user}")
+    print(f"Current user.id from token: {user.id}")
+    print(f"--------------------")
+
     """Видалення фільтра."""
+
     success = await service.delete_filter(filter_id=filter_id, user_id=user.id)
+
     if not success:
         raise HTTPException(status_code=404, detail="Фільтр не знайдено")
     return None
+
+

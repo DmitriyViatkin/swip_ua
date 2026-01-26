@@ -20,4 +20,4 @@ router.include_router(update_advert)
 router.include_router(delete_advert)
 router.include_router(promotion_create)
 router.include_router(promotion_update)
-router.include_router(filters)
+

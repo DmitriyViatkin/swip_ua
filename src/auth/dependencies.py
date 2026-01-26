@@ -10,20 +10,24 @@ oauth2_scheme = HTTPBearer()
 
 @inject
 async def get_current_user(
-    token_data: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
-    jwt_service: JWTService = Depends(),
-    user_service: FromDishka[UserService] = Depends(FromDishka),
+
+        jwt_service: FromDishka[JWTService],
+        user_service: FromDishka[UserService],
+token_data: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
 ) -> User:
-    token = token_data.credentials  # ← ИСПРАВЛЕНО
+    token = token_data.credentials
 
     try:
         payload = jwt_service.decode_token(token)
-        user_id = getattr(payload, "user_id", None)
+
+        user_id = payload.get("user_id") if isinstance(payload, dict) else getattr(payload, "user_id", None)
+
         if not user_id:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token: missing user_id",
             )
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -33,8 +37,10 @@ async def get_current_user(
     user = await user_service.get_user(user_id)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_401_UNAUTHORIZED,  # Краще 401, якщо юзера не існує
             detail="User not found",
         )
+    print(f"DEBUG: User ID: {user.id} | Role: {user.role} | Method: DELETE Attempt")
+
 
     return user

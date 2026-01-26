@@ -43,10 +43,29 @@ class FilterService:
         await self.session.refresh(update_obj)
         return update_obj
 
-    async def delete_filter(self, filter_id: int, user_id: int) -> bool:
+    async def delete_filter(self, filter_id: int, user_id: int):
+        # 1. Отримуємо фільтр за ID
         db_filter = await self.filter_repo.get_by_id(filter_id)
-        if not db_filter or db_filter.user_id != user_id:
-            return False
+
+        # ДІАГНОСТИКА (виведеться в консоль серверу)
+        print(f"\n=== [DEBUG] DELETE ATTEMPT ===", flush=True)
+        if not db_filter:
+            print(f"Result: Filter {filter_id} NOT FOUND", flush=True)
+            raise HTTPException(status_code=404, detail="Фільтр не знайдено")
+
+        print(f"Filter ID: {db_filter.id}", flush=True)
+        print(f"Owner ID: {db_filter.user_id} ({type(db_filter.user_id)})", flush=True)
+        print(f"Requester ID: {user_id} ({type(user_id)})", flush=True)
+
+        # 2. Перевірка власності (приводимо до int про всяк випадок)
+        if int(db_filter.user_id) != int(user_id):
+            print(f"Result: FORBIDDEN (Ownership mismatch)", flush=True)
+            raise HTTPException(status_code=403, detail="Доступ заборонено: ви не є власником")
+
+        print(f"Result: SUCCESS (Deleting...)", flush=True)
+        print(f"=============================\n", flush=True)
+
+        # 3. Видалення та комміт
         await self.filter_repo.delete(db_filter)
         await self.session.commit()
         return True
