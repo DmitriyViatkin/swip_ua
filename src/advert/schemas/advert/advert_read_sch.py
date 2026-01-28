@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, ConfigDict
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, List
 from ..gallery_image_sch import GalleryImageRead
 from .. gallery_sch import GalleryRead
 from ..promotion.promotion_read_sch import PromotionRead
@@ -37,3 +37,8 @@ class AdvertRead(BaseModel):
 
     
     model_config = ConfigDict(from_attributes=True)
+
+class AdvertList(BaseModel):
+        items: List[AdvertRead]
+
+        model_config = ConfigDict(from_attributes=True)

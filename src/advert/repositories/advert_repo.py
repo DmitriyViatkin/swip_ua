@@ -6,16 +6,15 @@
 from .advert_base_repo import BaseRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, and_
-from ..models.advert import Advert
-from ..models.filters import Filter
+from src.enums import TypeEnum
 from ..models.gallery import Gallery
-from typing import Type
-from sqlalchemy.orm import selectinload
-from sqlalchemy import select, and_
+
+from sqlalchemy import select, and_, or_, desc,asc,nulls_last, case
 from sqlalchemy.orm import selectinload
 
 # Імпортуємо необхідні моделі
 from src.advert.models.advert import Advert
+from src.advert.models.promotion import Promotion
 from src.building.models.house import House
 from src.building.models.infrastructure import Infrastructure
 from src.building.models.advantage_of_home import Advantages_of_Home
@@ -85,18 +84,25 @@ class AdvertRepository(BaseRepository[Advert]):
 
     async def get_all(self):
         stmt = (
-            select(Advert)
+            select(Advert).outerjoin(Promotion)
             .where((Advert.is_approved == True) & (Advert.is_active == True))
             .options(
-                selectinload(Advert.promotion),  # загружаем промо заранее
-                selectinload(Advert.gallery).selectinload(Gallery.images)  # галерея + картинки
+                selectinload(Advert.promotion),
+                selectinload(Advert.gallery).selectinload(Gallery.images)
+            ).order_by(
+    case(
+        (Promotion.type_promotion == TypeEnum.TURBO, 1),
+        (Promotion.type_promotion == TypeEnum.UP, 2),
+        else_=3
+    ),
+    desc(Advert.id)
             )
         )
 
         result = await self.session.execute(stmt)
-        return result.scalars().all()
+        return result.scalars().unique().all()
 
-    async def get_by_id(self, advert_id: int) -> Advert | None:
+    """async def get_by_id(self, advert_id: int) -> Advert | None:
         stmt = (
             select(Advert)
             .where(Advert.id == advert_id)
@@ -107,7 +113,7 @@ class AdvertRepository(BaseRepository[Advert]):
             )
         )
         result = await self.session.execute(stmt)
-        return result.scalar_one_or_none()
+        return result.scalar_one_or_none()"""
 
 
     async def moderation(self, advert_id: int, status: bool):
@@ -137,65 +143,98 @@ class AdvertRepository(BaseRepository[Advert]):
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def get_by_filter_params(self, filter_obj):
-        # 1. Створюємо базовий запит з усіма JOIN
+    async def get_by_filter_params(self, f):
         stmt = (
-            select(self.model)
-            .join(House, self.model.build_id == House.id)
-            .join(Infrastructure, House.id == Infrastructure.house_id, isouter=True)
-            .join(Advantages_of_Home, House.id == Advantages_of_Home.house_id, isouter=True)
+            select(Advert).outerjoin(Promotion)
+            .outerjoin(House, Advert.build_id == House.id)
+            .outerjoin(Infrastructure, House.id == Infrastructure.house_id)
+            .outerjoin(Advantages_of_Home, House.id == Advantages_of_Home.house_id)
         )
 
-        # 2. Список базових умов
         conditions = [
-            self.model.is_active == True,
-            self.model.is_approved == True
+            Advert.is_active.is_(True),
+            Advert.is_approved.is_(True),
         ]
 
-        # --- Функція-помічник для безпечного отримання значень ---
-        def get_val(name):
-            return getattr(filter_obj, name, None)
 
-        # --- Фільтрація по ADVERT (Прямі поля) ---
-        if get_val("rooms") is not None:
-            conditions.append(self.model.rooms == get_val("rooms"))
+        def val(name):
+            return getattr(f, name, None)
 
-        if get_val("price_from"):
-            conditions.append(self.model.price >= get_val("price_from"))
-        if get_val("price_to"):
-            conditions.append(self.model.price <= get_val("price_to"))
+        # ---- ADVERT ----
+        if val("rooms") is not None:
+            conditions.append(Advert.rooms == val("rooms"))
 
-        if get_val("area_from"):
-            conditions.append(self.model.area >= get_val("area_from"))
-        if get_val("area_to"):
-            conditions.append(self.model.area <= get_val("area_to"))
+        if val("price_from") is not None:
+            conditions.append(Advert.price >= val("price_from"))
 
-        # --- Фільтрація по INFRASTRUCTURE (Через House) ---
-        if get_val("type_build"):
-            conditions.append(Infrastructure.type_build == get_val("type_build"))
+        if val("price_to") is not None:
+            conditions.append(Advert.price <= val("price_to"))
 
-        if get_val("utility_bills"):
-            conditions.append(Infrastructure.utility_bills == get_val("utility_bills"))
+        if val("area_from") is not None:
+            conditions.append(Advert.area >= val("area_from"))
 
-        if get_val("distance_to_the_sea"):
-            conditions.append(Infrastructure.distance_to_sea <= get_val("distance_to_the_sea"))
+        if val("area_to") is not None:
+            conditions.append(Advert.area <= val("area_to"))
 
-        if get_val("ceiling_height"):
-            conditions.append(Infrastructure.ceiling_height >= get_val("ceiling_height"))
+        # ---- INFRASTRUCTURE ----
+        if val("type_build"):
+            conditions.append(
+                or_( Infrastructure.type_build == val("type_build"),
+                    Infrastructure.id.is_(None)
+                )
+            )
 
-        # --- Фільтрація по ADVANTAGES (Через House) ---
-        # Навіть якщо цих полів немає в моделі Filter, код не впаде
-        if get_val("is_parking") is not None:
-            conditions.append(Advantages_of_Home.is_parking == get_val("is_parking"))
+        if val("utility_bills"):
+            conditions.append(
+                or_(
+                    Infrastructure.utility_bills == val("utility_bills"),
+                    Infrastructure.id.is_(None)
+                )
+            )
 
-        # 3. Виконання запиту
-        stmt = stmt.where(and_(*conditions)).distinct()
-        stmt = stmt.options(
-            selectinload(self.model.gallery),
-            selectinload(self.model.promotion)
-        )
+        if val("distance_to_the_sea"):
+            conditions.append(
+                or_(
+                    Infrastructure.distance_to_sea <= val("distance_to_the_sea"),
+                    Infrastructure.id.is_(None)
+                )
+            )
+
+        if val("ceiling_height"):
+            conditions.append(
+                or_(
+                    Infrastructure.ceiling_height >= val("ceiling_height"),
+                    Infrastructure.id.is_(None)
+                )
+            )
+
+        # ---- ADVANTAGES ----
+        if val("is_parking") is not None:
+            conditions.append(
+                or_(
+                    Advantages_of_Home.is_parking == val("is_parking"),
+                    Advantages_of_Home.id.is_(None)
+                )
+            )
+
+        stmt = (
+            stmt
+            .where(and_(*conditions))
+            .options(
+                selectinload(Advert.gallery),
+                selectinload(Advert.promotion),
+            ).order_by(
+                        case(
+                            (Promotion.type_promotion == TypeEnum.TURBO, 1),
+                            (Promotion.type_promotion == TypeEnum.UP, 2),
+                            else_=3
+                        ),
+                        desc(Advert.id)
+                            ))
+
+
 
         result = await self.session.execute(stmt)
-        return result.scalars().all()
+        return result.scalars().unique().all()
 
 

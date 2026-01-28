@@ -4,13 +4,26 @@ from src.advert.repositories.advert_repo import AdvertRepository
 from src.advert.schemas.filters.filters_create_sch import FilterCreate
 from src.advert.schemas.filters.filters_update_sch import FilterUpdate
 from fastapi import HTTPException
-
+from sqlalchemy import select, and_
+from ..models.advert import Advert
+from src.building.models.advantage_of_home import Advantages_of_Home
+from src.building.models.house import House
+from src.building.models.infrastructure import Infrastructure
+from sqlalchemy.orm import selectinload
 
 class FilterService:
     def __init__(self, session: AsyncSession):
         self.session = session
         self.filter_repo = FilterRepository(session)
         self.ad_repo = AdvertRepository(session)
+
+    async def get_results_by_existing_filter(self, filter_id: int, user_id: int):
+        db_filter = await self.filter_repo.get_by_id(filter_id)
+
+        if not db_filter or db_filter.user_id != user_id:
+            return None
+
+        return await self.ad_repo.get_by_filter_params(db_filter)
 
     async def create_user_filter(self, user_id: int, filter_data: FilterCreate):
         data = filter_data.model_dump()
@@ -48,36 +61,24 @@ class FilterService:
         db_filter = await self.filter_repo.get_by_id(filter_id)
 
         # ДІАГНОСТИКА (виведеться в консоль серверу)
-        print(f"\n=== [DEBUG] DELETE ATTEMPT ===", flush=True)
+
         if not db_filter:
-            print(f"Result: Filter {filter_id} NOT FOUND", flush=True)
+
             raise HTTPException(status_code=404, detail="Фільтр не знайдено")
 
-        print(f"Filter ID: {db_filter.id}", flush=True)
-        print(f"Owner ID: {db_filter.user_id} ({type(db_filter.user_id)})", flush=True)
-        print(f"Requester ID: {user_id} ({type(user_id)})", flush=True)
+
 
         # 2. Перевірка власності (приводимо до int про всяк випадок)
         if int(db_filter.user_id) != int(user_id):
-            print(f"Result: FORBIDDEN (Ownership mismatch)", flush=True)
+
             raise HTTPException(status_code=403, detail="Доступ заборонено: ви не є власником")
 
-        print(f"Result: SUCCESS (Deleting...)", flush=True)
-        print(f"=============================\n", flush=True)
+
 
         # 3. Видалення та комміт
         await self.filter_repo.delete(db_filter)
         await self.session.commit()
         return True
 
-    async def get_results_by_existing_filter(self, filter_id: int, user_id: int):
-        # Отримуємо фільтр
-        db_filter = await self.filter_repo.get_by_id(filter_id)
-
-        # Перевіряємо власника (щоб чужі не дивилися результати)
-        if not db_filter or db_filter.user_id != user_id:
-            return None
-
-        # Пошук оголошень
-        ads = await self.ad_repo.get_by_filter_params(db_filter)
-        return ads
+    async def search(self, filter_data: FilterCreate):
+        return await self.ad_repo.get_by_filter_params(filter_data)

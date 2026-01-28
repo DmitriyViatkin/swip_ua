@@ -107,6 +107,7 @@ class CommunicationPartyEnum(str, Enum):
 class TypeEnum(str, Enum):
     UP = "up"
     TURBO = "turbo"
+    FREE = "free"
 
 
 class HousingMarketEnum(str, Enum):
