@@ -18,6 +18,7 @@ from config.infra.providers.gallery_provider import GalleryProvider
 from config.infra.providers.promotion_provider import PromotionProviders
 from config.infra.providers.filter_provider import FilterProvider
 from config.infra.providers.JWTservice import JWTProviders
+from config.infra.providers.message_provider import MessageProviders
 container = make_async_container(
 
     PostgresProvider(),
@@ -34,6 +35,7 @@ container = make_async_container(
     PromotionProviders(),
     FilterProvider(),
     JWTProviders(),
+    MessageProviders(),
 
     context={
         InfraSettings: infra_settings,
