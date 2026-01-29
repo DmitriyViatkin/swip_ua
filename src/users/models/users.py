@@ -3,8 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.database import Base
 from src.enums import UserRole
-# Не забудь импортировать Message, если он в другом файле,
-# либо оставь строковые ссылки, как сейчас.
+
 
 class User(Base):
     __tablename__ = "users"
@@ -31,7 +30,7 @@ class User(Base):
         foreign_keys="Notification.agent_id"
     )
 
-    # ИСПРАВЛЕНО: Убрал [] в Message
+
     sent_messages = relationship(
         "Message",
         foreign_keys="Message.sender_id",
@@ -65,3 +64,5 @@ class User(Base):
     )
     is_email_verified = Column(Boolean, default=False)
     is_blacklisted = Column(Boolean, default=False)
+    favorites = relationship("Favorite", back_populates="user", cascade="all, delete-orphan")
+    complaints = relationship("Complaint", back_populates="author", cascade="all, delete-orphan")

@@ -157,5 +157,9 @@ class PaymentEnum(str, Enum):
     INSTALLMENT = "installment"
     MATERNAL_CAPITAL = "maternal_capital"
 
-
+class ComplaintReasonEnum(str, Enum):
+    INCORRECT_PRICE = "Некоректна ціна"
+    INCORRECT_PHOTO = "Некоректне фото"
+    INCORRECT_DESCRIPTION = "Некоректний опис"
+    OTHER = "Інше"
 

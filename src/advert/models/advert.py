@@ -48,3 +48,5 @@ class Advert(Base):
     build = relationship("House", back_populates="adverts")
 
     promotion = relationship("Promotion", back_populates="advert", uselist=False)
+    favorited_by = relationship("Favorite", back_populates="advert", cascade="all, delete-orphan")
+    complaints = relationship("Complaint", back_populates="advert", cascade="all, delete-orphan")
