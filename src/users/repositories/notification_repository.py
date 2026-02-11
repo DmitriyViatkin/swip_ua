@@ -30,11 +30,10 @@ class NotificationRepository:
         await self.session.refresh(notification)
         return notification
 
-    async def update(self, notification_id: int, **data) -> Optional[Notification]:
-        """ Updates an existing notification record by ID. """
+    async def update (self, user_id: int, **data) -> Optional[Notification]:
         stmt = (
             update(Notification)
-            .where(Notification.id == notification_id)
+            .where(Notification.client_id == user_id)  # Шукаємо за власником, а не за ID запису
             .values(**data)
             .returning(Notification)
         )

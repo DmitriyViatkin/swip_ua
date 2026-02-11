@@ -13,6 +13,9 @@ from .routers.delete_news import  router as delete_news
 from .routers.document import  router as document
 from .routers.exel import  router as exel
 from .routers.gallery import  router as gallery
+from .routers.chessboard_rout.get_chessboard import router as chessboard
+from .routers.chessboard_rout.all_chessboard import router as all_chessboard
+from .routers.chessboard_rout.add_flat import router as add_flat
 
 router = APIRouter(prefix="/development", tags=["Develop"])
 
@@ -31,3 +34,6 @@ router.include_router(delete_news)
 router.include_router(document)
 router.include_router(exel)
 router.include_router(gallery)
+router.include_router(chessboard)
+router.include_router(all_chessboard)
+router.include_router(add_flat)

@@ -3,6 +3,7 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from src.auth.security.password import verify_password
 from src.auth.services.jwt_service import JWTService
 from src.users.schemas.user.user_read import UserRead
+from src.users.schemas.user.login_sch import UserLoginRead
 
 class AuthService:
     def __init__(self, user_repository, jwt_service: JWTService):
@@ -16,7 +17,7 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid username or password"
             )
-        return UserRead.model_validate(user)
+        return UserLoginRead.model_validate(user)
 
     def create_tokens(self, user: UserRead) -> dict:
         data = {

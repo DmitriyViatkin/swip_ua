@@ -30,7 +30,7 @@ class FavoritesRepository:
 
         """Отримує всі обрані оголошення користувача."""
 
-        query = select(Favorite).where(Favorite.user.id == user_id)
+        query = select(Favorite).where(Favorite.user_id == user_id)
         result = await self.session.execute(query)
         return result.scalars().all()
 

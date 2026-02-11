@@ -76,7 +76,7 @@ class LayoutEnum(str, Enum):
     SEPARATE = "Сан узел и туалет роздельно"
 
 
-  #(Состояние/стадия строительства)
+
 class StateEnum(str, Enum):
     HANDED_OVER = "handed over"
     PIT = "pit"
@@ -89,7 +89,7 @@ class HeatingEnum(str, Enum):
     INDIVIDUAL = "Индивидуальное"
 
 
-# Соответствует choises_payment (Для кого оплата)
+
 class PaymentPartyEnum(str, Enum):
     USER = "user"
     DEVELOPER = "developer"

@@ -10,11 +10,10 @@ oauth2_scheme = HTTPBearer()
 
 @inject
 async def get_current_user(
-
-        jwt_service: FromDishka[JWTService],
-        user_service: FromDishka[UserService],
-token_data: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
-) -> User:
+    jwt_service: FromDishka[JWTService],
+    user_service: FromDishka[UserService],
+    token_data: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
+):
     token = token_data.credentials
 
     try:
@@ -37,10 +36,8 @@ token_data: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
     user = await user_service.get_user(user_id)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,  # Краще 401, якщо юзера не існує
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found",
         )
-    print(f"DEBUG: User ID: {user.id} | Role: {user.role} | Method: DELETE Attempt")
-
 
     return user

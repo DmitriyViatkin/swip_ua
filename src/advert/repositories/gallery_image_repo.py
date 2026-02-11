@@ -40,12 +40,15 @@ class GalleryImageRepository(BaseRepository[GalleryImage]):
         return result.scalars().all()
 
     async def bulk_reorder(
-            self,
-            session: AsyncSession,
-            advert_id: int,
-            items: list[GalleryOrder],
+        self,
+        session: AsyncSession,
+        advert_id: int,
+        items: list[GalleryOrder],
     ):
-        # 1. Получаем gallery_id
+        if not items:
+            return
+
+        # 1. Получаем gallery_id объявления
         gallery_id_stmt = (
             select(Gallery.id)
             .join(Advert, Advert.gallery_id == Gallery.id)
@@ -57,7 +60,7 @@ class GalleryImageRepository(BaseRepository[GalleryImage]):
         if not gallery_id:
             raise ValueError("Gallery not found for advert")
 
-        # 2. Получаем все изображения галереи, отсортированные по позиции
+        # 2. Загружаем все картинки галереи
         images_stmt = (
             select(GalleryImage)
             .where(GalleryImage.gallery_id == gallery_id)
@@ -69,40 +72,45 @@ class GalleryImageRepository(BaseRepository[GalleryImage]):
         if not images:
             return
 
-        # Карты позиций пользователя
-        order_map = {item.id: item.position for item in items}
-        used_positions = set(order_map.values())
+        images_by_id = {img.id: img for img in images}
 
-        # Картинки с пользовательскими позициями
-        user_images = [img for img in images if img.id in order_map]
+        # 3. Оставляем только валидные id
+        order_map = {
+            item.id: item.position
+            for item in items
+            if item.id in images_by_id
+        }
+
+        if not order_map:
+            return
+
+        # 4. Пользовательские картинки
+        user_images = [images_by_id[iid] for iid in order_map]
         user_images.sort(key=lambda img: order_map[img.id])
 
-        # Картинки без указанных позиций
+        # 5. Остальные картинки
         other_images = [img for img in images if img.id not in order_map]
 
-        # Функция для поиска свободной позиции, сдвигая вперёд при конфликтах
-        def find_next_free_position(start_pos, used_pos_set):
-            pos = start_pos
-            while pos in used_pos_set:
+        # 6. Поиск свободной позиции
+        def find_next_free_position(start: int, occupied: set[int]) -> int:
+            pos = start
+            while pos in occupied:
                 pos += 1
             return pos
 
-        # Назначаем позиции пользовательским картинкам строго из order_map
+        # 7. Назначаем пользовательские позиции
+        occupied_positions = set()
+
         for img in user_images:
             img.position = order_map[img.id]
+            occupied_positions.add(img.position)
 
-
-        # Чтобы избежать конфликта, теперь для остальных картинок назначаем позиции:
-        # Если позиция у старой картинки конфликтует, сдвигаем вперёд до свободной
-        occupied_positions = set(order_map.values())
-
+        # 8. Сдвигаем остальные картинки
         for img in other_images:
             new_pos = find_next_free_position(img.position, occupied_positions)
             img.position = new_pos
             img.is_main = False
             occupied_positions.add(new_pos)
-
-
 
         await session.flush()
 

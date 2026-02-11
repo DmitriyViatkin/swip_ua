@@ -12,6 +12,8 @@ from src.building.repositories.news import NewsRepository
 from src.building.repositories.registration_and_payment import RegistrationAndPaymentRepository
 from src.building.repositories.riser import RiserRepository
 from src.building.repositories.section import SectionRepository
+from src.building.repositories.chessboard_repository import ChessboardRepository
+
 
 # services
 from src.building.services.advantages_of_home import AdvantagesOfHomeService
@@ -27,6 +29,7 @@ from src.building.services.riser import RiserService
 from src.building.services.section import SectionService
 from src.building.services.personal_cabinet_service import PersonalCabinetService
 from src.advert.services.gallery_serv import GalleryService
+from src.building.services.chessboard_service import ChessboardService
 
 class BuildingProvider(Provider):
     """Main DI provider for the Building module."""
@@ -152,3 +155,13 @@ class BuildingProvider(Provider):
 
 
     gallery_service = provide(GalleryService, scope=Scope.REQUEST)
+
+    chessboard_repo = provide(
+        ChessboardRepository,
+        scope=Scope.REQUEST,
+    )
+
+    chessboard_service = provide(
+        ChessboardService,
+        scope=Scope.REQUEST,
+    )

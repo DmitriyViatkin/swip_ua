@@ -8,20 +8,20 @@ from src.auth.services.auth_service import AuthService
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from src.auth.dependencies import get_current_user
 from src.users.models.users import User
-
+from fastapi_pagination import Page, paginate
 
 
 bearer_scheme = HTTPBearer()
 router = APIRouter()
 
-@router.get("/all_users_from_blacklist", response_model= UserBlackList)
+@router.get("/all_users_from_blacklist", response_model= Page[UserBlackList])
 @inject
 async def get_all_users(
    # current_user: User = Depends(get_current_user),
     user_service: FromDishka[UserService] = Depends(),
 ):
     users = await user_service.get_blocked_user()
-    return  {"items": users}
+    return  paginate (users)
 
 
 

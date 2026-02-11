@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field,ConfigDict
 from src.enums import UserRole
 
 class UserUpdate(BaseModel):
@@ -9,7 +9,4 @@ class UserUpdate(BaseModel):
     role: Optional[UserRole] = None
     photo: Optional[str] = None
 
-    model_config = {
-        "from_attributes": True,
-        "use_enum_values": True
-    }
+    model_config = ConfigDict(from_attributes=True)

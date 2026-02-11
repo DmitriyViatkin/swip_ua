@@ -23,3 +23,5 @@ dev:
 	@echo "make api"
 	@echo "make celery"
 
+test:
+	poetry run pytest

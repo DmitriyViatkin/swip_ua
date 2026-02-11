@@ -31,8 +31,13 @@ class SubscriptionService:
         obj = await self.repo.create(**data.model_dump())
         return SubscriptionRead.model_validate(obj)
 
-    async def update(self, subscription_id: int, data: SubscriptionUpdate) -> Optional[SubscriptionRead]:
-        obj = await self.repo.update(subscription_id, **data.model_dump(exclude_unset=True))
+    async def update_by_user_id(self, user_id: int, data: SubscriptionUpdate) -> Optional[SubscriptionRead]:
+        # Створюємо словник для оновлення, виключаючи user_id, щоб не було дублювання
+        update_data = data.model_dump(exclude_unset=True)
+        update_data.pop("user_id", None)  # Видаляємо user_id, якщо він там є
+
+        obj = await self.repo.update_by_user_id(user_id, **update_data)
+
         if not obj:
             return None
         return SubscriptionRead.model_validate(obj)

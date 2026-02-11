@@ -20,16 +20,21 @@ class NotificationService:
             return None
         return  NotificationRead.model_validate(notification)
 
-    async def create_notification (self, data:NotificationCreate) -> NotificationRead:
-        notification = await self.repo.create(**data.model_damp())
+    async def create_notification(self, data: NotificationCreate) -> NotificationRead:
+        notification = await self.repo.create(**data.model_dump())  # Було model_damp
         return NotificationRead.model_validate(notification)
 
-    async def update_notification (self, notification_id: int, data: NotificationUpdate) -> Optional[
-        NotificationRead]:
+    async def update_notification(self, user_id: int, data: NotificationUpdate) -> Optional[NotificationRead]:
+        # 1. Спробуємо оновити
+        notification = await self.repo.update(user_id, **data.model_dump(exclude_unset=True))
 
-        notification = await self.repo.update(notification_id, **data.model_dump(exclude_unset=True))
+        # 2. Якщо не знайшли (повернуло None), то створюємо новий запис
         if not notification:
-            return None
+            # Додаємо client_id до даних для створення
+            create_data = data.model_dump(exclude_unset=True)
+            create_data["client_id"] = user_id
+            notification = await self.repo.create(**create_data)
+
         return NotificationRead.model_validate(notification)
 
     async def delete_notification(self, notification_id: int) -> None:

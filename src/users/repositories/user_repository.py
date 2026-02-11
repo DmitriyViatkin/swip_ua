@@ -49,7 +49,13 @@ class UserRepository:
         return result.scalars().all()
 
     async def get_by_email(self, email: str) -> Optional[User]:
-        stmt = select(User).where(User.email == email)
+        stmt = select(User).options(
+            selectinload(User.agent),
+            selectinload(User.clients),
+            selectinload(User.subscription),
+            selectinload(User.client_notifications),
+            selectinload(User.redirections),
+        ).where(User.email == email)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
@@ -85,9 +91,11 @@ class UserRepository:
         stmt = (
             select(User)
             .options(
+                selectinload(User.agent),  # ← ОБЯЗАТЕЛЬНО
                 selectinload(User.subscription),
-                selectinload(User.clients),
-
+                selectinload(User.agent),
+                selectinload(User.client_notifications),
+                selectinload(User.redirections),
             )
             .where((User.email == login) | (User.phone == login))
         )

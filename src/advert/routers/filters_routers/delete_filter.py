@@ -20,11 +20,7 @@ async def delete_filter(
         user: CurrentUser,
 ):
 
-    print(f"--- ROUTER DEBUG ---")
-    print(f"Target filter_id: {filter_id}")
-    print(f"Current user object: {user}")
-    print(f"Current user.id from token: {user.id}")
-    print(f"--------------------")
+
 
     """Видалення фільтра."""
 

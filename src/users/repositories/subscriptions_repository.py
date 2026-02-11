@@ -33,11 +33,16 @@ class SubscriptionRepository:
         await self.session.refresh(obj)
         return obj
 
-    async def update(self, subscription_id: int, **data) -> Optional[Subscription]:
+    async def update_by_user_id(self, user_id: int, **values) -> Optional[Subscription]:
+        values.pop("user_id", None)  # Видаляємо зайве, якщо воно прийшло в kwargs
+
+        if not values:
+            return await self.get_by_user_id(user_id)
+
         stmt = (
             update(Subscription)
-            .where(Subscription.id == subscription_id)
-            .values(**data)
+            .where(Subscription.user_id == user_id)
+            .values(**values)
             .returning(Subscription)
         )
         result = await self.session.execute(stmt)

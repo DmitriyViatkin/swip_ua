@@ -16,11 +16,11 @@ class Complaint(Base):
     comment = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Зовнішні ключі
+
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     advert_id = Column(Integer, ForeignKey("adverts.id", ondelete="CASCADE"), nullable=False)
 
-    # Зв'язки
+
     author = relationship("User", back_populates="complaints")
     advert = relationship("Advert", back_populates="complaints")
 
