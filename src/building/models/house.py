@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.database import Base
 
-from src.listings.models.gallery import Gallery
+
 
 
 class House(Base):
@@ -17,8 +17,8 @@ class House(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     user = relationship("User", back_populates="houses")
 
-    gallery_id = Column(Integer, ForeignKey("galleries.id"))
-    gallery = relationship("Gallery", back_populates="house")
+    gallery_id = Column(Integer, ForeignKey("galleries.id"), nullable=True)
+    gallery = relationship("Gallery")
 
     corps = relationship("Corps", back_populates="house", cascade="all, delete-orphan")
     documents = relationship("Document", back_populates="house", cascade="all, delete-orphan")
@@ -33,5 +33,4 @@ class House(Base):
     infrastructure = relationship(
         "Infrastructure", back_populates="house", uselist=False
     )
-    adverts = relationship("Advert", back_populates="build",
-                           cascade="all, delete-orphan")
+    adverts = relationship("Advert", back_populates="build", cascade="all, delete-orphan")

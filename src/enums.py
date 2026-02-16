@@ -1,164 +1,166 @@
 """Enums module."""
-from enum import StrEnum
+from enum import Enum
 
 
-class UserRole(StrEnum):
+class UserRole(str, Enum):
     ADMIN = "admin"
+    SUPERADMIN = "superadmin"
     AGENT = "agent"
-    DEV = "dev"             # Developer / застройщик
+    DEV = "dev"
     NOTARY = "notary"
-    SALES_DEP = "sales_dep" # Sales Department
+    SALES_DEP = "sales_dep"
     CLIENT = "client"
 
 
-class BuildingStatus(StrEnum):
+class BuildingStatus(str, Enum):
     APARTMENT = "apartment"
     COTTAGE = "cottage"
     HOUSE = "house"
 
 
-class BuildingType(StrEnum):
+class BuildingType(str, Enum):
     APARTMENT_BUILDING = "apartment_building"
     PRIVATE_HOUSE = "private_house"
 
 
-class HomeClass(StrEnum):
+class HomeClass(str, Enum):
     ELITE = "elite"
     BUDGET = "budget"
 
 
-class ConstructionTechnology(StrEnum):
+class ConstructionTechnology(str, Enum):
     MONOLITH_EXPANDED_CLAY = "monolith_expanded_clay"
     BRICK = "brick"
 
 
-class TerritoryChoice(StrEnum):
+class TerritoryChoice(str, Enum):
     CLOSED_GUARDED = "closed_guarded"
     CLOSED = "closed"
     OPEN_UNGUARDED = "open_unguarded"
 
 
-class GasChoice(StrEnum):
+class GasChoice(str, Enum):
     YES = "yes"
     NO = "no"
 
 
-class HeatingChoice(StrEnum):
+class HeatingChoice(str, Enum):
     CENTRAL = "central"
     INDIVIDUAL = "individual"
 
 
-class SewerageChoice(StrEnum):
+class SewerageChoice(str, Enum):
     INDIVIDUAL = "individual"
     CENTRAL = "central"
 
 
-class WaterSupplyChoice(StrEnum):
+class WaterSupplyChoice(str, Enum):
     CENTRAL = "central"
     INDIVIDUAL = "individual"
 
 
-class UtilityBillsChoice(StrEnum):
+class UtilityBillsChoice(str, Enum):
     FIXED = "fixed"
     BY_METER = "by_meter"
 
 
-
-# Соответствует choises_appointment
-class AppointmentEnum(StrEnum):
+class AppointmentEnum(str, Enum):
     APARTMENTS = "Апартаменты"
     FLAT = "Квартира"
     HOUSE = "Дом"
     STUDIO = "Студия"
 
-# Соответствует choises_layout
-class LayoutEnum(StrEnum):
+
+
+class LayoutEnum(str, Enum):
     JOINT = "санузел+ туалет"
     SEPARATE = "Сан узел и туалет роздельно"
 
-# Соответствует choises_state (Состояние/стадия строительства)
-class StateEnum(StrEnum):
-    HANDED_OVER = "handed over" # Сдан в эксплуатацию
-    PIT = "pit"                 # Котлован / на стадии строительства
 
-# Соответствует choises_heating
-class HeatingEnum(StrEnum):
+
+class StateEnum(str, Enum):
+    HANDED_OVER = "handed over"
+    PIT = "pit"
+
+
+
+class HeatingEnum(str, Enum):
     CENTRALIZED = "Централизованное"
     AUTONOMOUS = "Автономное"
     INDIVIDUAL = "Индивидуальное"
 
-# Соответствует choises_payment (Для кого оплата)
-class PaymentPartyEnum(StrEnum):
+
+
+class PaymentPartyEnum(str, Enum):
     USER = "user"
     DEVELOPER = "developer"
     NOTARY = "notary"
     SALES_DEPARTMENT = "sales_department"
 
 
-class CommunicationPartyEnum(StrEnum):
+class CommunicationPartyEnum(str, Enum):
     USER = "user"
     DEVELOPER = "developer"
     NOTARY = "notary"
     SALES_DEPARTMENT = "sales_department"
 
-class TypeEnum(StrEnum):
-    UP= "up"
+
+class TypeEnum(str, Enum):
+    UP = "up"
     TURBO = "turbo"
-class HousingMarketEnum(StrEnum):
+    FREE = "free"
+
+
+class HousingMarketEnum(str, Enum):
     """Типы жилищного рынка."""
     SECONDARY = "вторичный рынок"
     NEW_BUILD = "новострой"
     COTTAGE = "котедж"
 
-# =========================================================================
-# Соответствует choises_district (первый блок)
-# &lt;div style=&quot;text-align: left;&quot;&gt;district&lt;/div&gt;
 
-class DistrictEnum(StrEnum):
+class DistrictEnum(str, Enum):
     """Основные районы/дистрикты."""
     CENTER = "центр"
     KHORTYTSKY = "Хортицкий"
     KOSMICHESKY = "Космический"
 
-# =========================================================================
-# Соответствует choises_microdistrict (второй блок с 'district' с числами 1, 2, 3)
-# Примечание: В диаграмме это поле названо "district", но по смыслу, скорее всего,
-# оно соответствует полю 'microdistrict' из предыдущего запроса.
-# В данном случае, это просто числовые метки.
 
-class MicroDistrictEnum(StrEnum):
+class MicroDistrictEnum(str, Enum):
     """Микрорайоны, обозначенные числами."""
     ONE = "1"
     TWO = "2"
     THREE = "3"
 
-# =========================================================================
-# Соответствует choises_finishing (третий блок с 'district' и отделкой)
-# &lt;div style=&quot;text-align: left;&quot;&gt;district&lt;/div&gt;
 
-class FinishingEnum(StrEnum):
+class FinishingEnum(str, Enum):
     """Типы отделки."""
     ROUGH = "Черновая"
     FINISHED = "Готова"
     OPTION_3 = "3"
 
-class StatusBuildEnum(StrEnum):
-    """Статус строительства (ранее StateEnum)."""
-    HANDED_OVER = "handed over"  # Сдан
-    PIT = "pit"                  # Котлован
 
-class BuildTypeEnum(StrEnum):
-    """Тип строения (ранее BuildingType)."""
+class StatusBuildEnum(str, Enum):
+    """Статус строительства."""
+    HANDED_OVER = "handed over"
+    PIT = "pit"
+
+
+class BuildTypeEnum(str, Enum):
+    """Тип строения."""
     APARTMENT_BUILDING = "apartment_building"
     PRIVATE_HOUSE = "private_house"
 
-class PaymentEnum(StrEnum):
-    """Способы оплаты (добавлен, так как его не было)."""
+
+class PaymentEnum(str, Enum):
+    """Способы оплаты."""
     CASH = "cash"
     MORTGAGE = "mortgage"
     INSTALLMENT = "installment"
     MATERNAL_CAPITAL = "maternal_capital"
 
-class UtilityBillsChoice(StrEnum):
-    FIXED = "fixed"
-    BY_METER = "by_meter"
+class ComplaintReasonEnum(str, Enum):
+    INCORRECT_PRICE = "Некоректна ціна"
+    INCORRECT_PHOTO = "Некоректне фото"
+    INCORRECT_DESCRIPTION = "Некоректний опис"
+    OTHER = "Інше"
+

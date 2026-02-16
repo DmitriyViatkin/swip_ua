@@ -19,7 +19,7 @@ fileConfig(config.config_file_name)
 # --------------------------------------------------------------------
 # 3. Настройки проекта
 # --------------------------------------------------------------------
-from core.infra.config.settings import get_infra_settings
+from config.infra.config.settings import get_infra_settings
 settings = get_infra_settings()
 
 # --------------------------------------------------------------------
@@ -44,7 +44,7 @@ config.set_main_option("sqlalchemy.url", sync_url)
 from src.database import Base
 import src.users.models
 import src.building.models
-import src.listings.models
+import src.advert.models
 
 # --------------------------------------------------------------------
 # 6. Передаем meta Alembic

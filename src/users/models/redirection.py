@@ -11,3 +11,4 @@ class Redirections (Base):
     user_id = Column(Integer, ForeignKey("users.id"), )
     user = relationship("User", back_populates = "redirections")
     date = Column(DateTime, server_default=func.now())
+    redirection = Column(Boolean, default=False)

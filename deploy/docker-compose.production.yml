@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: make start-prod
+    env_file:
+      - .env.production
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - staticfiles_collected:/app/staticfiles_collected
+      - media:/app/media
+
+  celery_worker:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: celery -A settings worker -l info
+    env_file:
+      - .env.production
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - media:/app/media
+
+  nginx:
+    image: nginx:latest
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - staticfiles_collected:/app/staticfiles_collected:ro
+      - media:/app/media:ro
+
+  redis:
+    image: redis:7
+    restart: always
+
+  db:
+    image: postgres:15
+    restart: always
+    env_file:
+      - .env.production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  staticfiles_collected:
+  media:
