@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from dishka.integrations.fastapi import FromDishka, inject
 
+from src.auth.role_dependencies import require_roles
 from src.auth.dependencies import get_current_user
+from  src.enums import UserRole
 from src.users.models.users import User
 from src.building.services.document import DocumentService
 from src.building.services.house import HouseService
@@ -17,7 +19,7 @@ router = APIRouter()
 @inject
 async def upload_spreadsheet( house_id: int, session: FromDishka[AsyncSession],
                               document_service: FromDishka[DocumentService],house_service: FromDishka[HouseService],
-                               current_user: User = Depends(get_current_user), file: UploadFile = File(...),):
+                               current_user: User = Depends(require_roles(UserRole.DEV)), file: UploadFile = File(...),):
     if file.content_type not in {
         "application/vnd.ms-excel",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

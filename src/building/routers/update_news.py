@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from dishka.integrations.fastapi import FromDishka, inject
-
+from src.auth.role_dependencies import require_roles
 from src.auth.dependencies import get_current_user
+from  src.enums import UserRole
 from src.users.models.users import User
 from src.building.schemas.news import NewsUpdate, NewsRead
 from src.building.services.news import NewsService
@@ -15,7 +16,7 @@ router = APIRouter()
 @inject
 async def update_news( house_id: int, news_id: int,  data: NewsUpdate, session: FromDishka[AsyncSession],
                         news_service: FromDishka[NewsService], house_service: FromDishka[HouseService],
-                       current_user: User = Depends(get_current_user),):
+                       current_user: User = Depends(require_roles(UserRole.DEV)),):
 
     house = await house_service.get_by_id(session, house_id)
     if not house:

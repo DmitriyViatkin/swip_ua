@@ -4,8 +4,13 @@ from fastapi.security import HTTPBearer
 from src.users.schemas.user.user_update import UserUpdate
 from src.users.schemas.user.user_read import UserRead
 from src.users.models.users import User
+from typing import Annotated
+from src.auth.role_dependencies import require_roles
 from src.auth.dependencies import get_current_user
+from  src.enums import UserRole
 from src.users.services.user_service import UserService
+
+CurrentUser = Annotated[User, Depends(require_roles(UserRole.CLIENT, UserRole.ADMIN))]
 bearer_scheme = HTTPBearer()
 
 router = APIRouter()
@@ -14,10 +19,13 @@ router = APIRouter()
 @inject
 async def update_user(
     user_id: int,
-    data: UserUpdate,
     user_service: FromDishka[UserService],
-    current_user: User = Depends(get_current_user),):
-    if current_user.id != user_id:
+    data: UserUpdate,
+    current_user: User = Depends(require_roles(UserRole.CLIENT, UserRole.ADMIN, UserRole.DEV)),
+
+):
+    # якщо не DEV — можна оновлювати тільки себе
+    if current_user.role != UserRole.DEV and current_user.id != user_id:
         raise HTTPException(status_code=403, detail="Forbidden: cannot update other user")
 
     updated_user = await user_service.update_user(user_id, data)

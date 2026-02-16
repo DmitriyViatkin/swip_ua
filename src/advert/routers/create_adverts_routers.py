@@ -2,16 +2,19 @@ import base64
 import binascii
 import uuid
 from pathlib import Path
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from dishka.integrations.fastapi import FromDishka, inject
+from src.auth.dependencies import get_current_user
+from src.users.models.users import User
+from typing import Annotated
 
 from src.advert.schemas.image_sch import AdvertCreateWithImages
 from src.advert.schemas.advert.advert_read_sch import AdvertRead
 from src.advert.services.advert_serv import AdvertService
 from src.advert.services.gallery_serv import GalleryService
 from src.advert.services.gallery_image_service import GalleryImageService
-
+CurrentUser = Annotated[User, Depends(get_current_user)]
 router = APIRouter()
 
 
@@ -23,6 +26,7 @@ async def create_advert(
     gallery_service: FromDishka[GalleryService],
     gallery_image_service: FromDishka[GalleryImageService],
     data: AdvertCreateWithImages,
+    user:CurrentUser,
 ):
     # 1️⃣ Создаем объявление
     advert = await advert_service.create(data.dict(exclude={"images"}))

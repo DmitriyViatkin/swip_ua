@@ -6,6 +6,7 @@ from config.infra.builder import FastAPIBuilder
 # Импорты роутеров
 from src.users.router import router as users_router
 from src.users.admin_routers import router as notary_router
+from src.users.routers.black_list.all_router_black_list import router as black_list
 from src.auth.router import router as auth_router
 from src.building.router import router as development_router
 from src.advert.router import router as adverts_router
@@ -42,12 +43,14 @@ app.mount(
 
 
 app.include_router(auth_router)
-app.include_router(users_router)
+
 app.include_router(message)
 app.include_router(notary_router)
-app.include_router(development_router)
-app.include_router(adverts_router)
-app.include_router(favorites)
-app.include_router( filter_router)
+app.include_router(black_list)
 app.include_router(moderation)
+app.include_router(development_router)
+app.include_router(users_router)
+app.include_router( filter_router)
+app.include_router(favorites)
+app.include_router(adverts_router)
 app.include_router(complaint)

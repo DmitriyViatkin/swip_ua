@@ -35,6 +35,9 @@ itsdangerous = "^2.2.0"
 python-magic = "^0.4.27"
 pytest = "^9.0.2"
 fastapi-pagination = "^0.15.10"
+gunicorn = "^25.0.3"
+mypy = "^1.19.1"
+aiofiles = "^25.1.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.0.0"

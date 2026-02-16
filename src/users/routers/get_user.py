@@ -2,11 +2,15 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dishka.integrations.fastapi import FromDishka, inject
 from src.users.schemas.user.user_read import UserRead
-from src.auth.dependencies import get_current_user
-from src.auth.services.auth_service import AuthService
+
 from src.users.models.users import User
 from src.users.services.user_service import UserService
-bearer_scheme = HTTPBearer()
+
+from  src.enums import UserRole
+from typing import Annotated
+from src.auth.role_dependencies import require_roles
+from src.auth.dependencies import get_current_user
+CurrentUser = Annotated[User, Depends(require_roles(UserRole.CLIENT, UserRole.ADMIN))]
 
 router = APIRouter()
 
@@ -15,7 +19,7 @@ router = APIRouter()
 async def get_user(
     user_id: int,
     user_service: FromDishka[UserService],
-    current_user: User = Depends(get_current_user),
+    user: CurrentUser,
 ):
     user = await user_service.get_user(user_id)
 

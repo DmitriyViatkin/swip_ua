@@ -8,6 +8,8 @@ from src.advert.schemas.complaint.complaint_create_sch import ComplaintCreate
 from src.advert.schemas.complaint.complaint_read_sch import ComplaintRead
 from src.auth.dependencies import get_current_user
 from src.users.models.users import User
+from typing import Annotated
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 router = APIRouter( )
 
@@ -20,6 +22,7 @@ router = APIRouter( )
 async def delete_complaint(
     complaint_id: int,
     service: FromDishka[ComplaintsService],
+        user: CurrentUser
 ):
     deleted = await service.resolve_complaint(complaint_id)
 

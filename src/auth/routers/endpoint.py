@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel,EmailStr
 from dishka.integrations.fastapi import FromDishka, inject
 from src.auth.services.auth_service import AuthService
 
@@ -7,7 +7,7 @@ router = APIRouter()
 
 
 class LoginRequest(BaseModel):
-    username: str
+    username: EmailStr
     password: str
 
 

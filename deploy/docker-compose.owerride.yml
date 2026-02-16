@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  web:
+    volumes:
+      - ..:/app
+      - ../media:/app/media
+    env_file:
+      - .env.development
+    command: make docker-start
+    ports:
+      - "8000:8000"
+
+  celery_worker:
+    volumes:
+      - ..:/app
+    env_file:
+      - .env.development
+    command: celery -A config.infra.utils.celery_app.celery_app worker -l info

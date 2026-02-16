@@ -4,6 +4,7 @@ from enum import Enum
 
 class UserRole(str, Enum):
     ADMIN = "admin"
+    SUPERADMIN = "superadmin"
     AGENT = "agent"
     DEV = "dev"
     NOTARY = "notary"

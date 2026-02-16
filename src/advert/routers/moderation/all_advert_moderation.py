@@ -6,7 +6,10 @@ from ... services.advert_serv import AdvertService
 from src.users.models.users import User
 from dishka.integrations.fastapi import FromDishka, inject
 from typing import List
-
+from src.auth.dependencies import get_current_user
+from src.users.models.users import User
+from typing import Annotated
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 router = APIRouter()
 
@@ -18,7 +21,7 @@ router = APIRouter()
 )
 @inject
 async def all_advert_moderation (
-
+    user:CurrentUser,
     advert_service: FromDishka[AdvertService],
 ):
     adverts = await advert_service.get_ads_to_moderate()

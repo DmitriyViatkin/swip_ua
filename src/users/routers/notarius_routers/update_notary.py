@@ -6,6 +6,8 @@ from src.users.schemas.user.user_read import UserRead
 from src.users.models.users import User
 from src.auth.dependencies import get_current_user
 from src.users.services.user_service import UserService
+from src.auth.dependencies import get_current_user
+from src.users.models.users import User
 bearer_scheme = HTTPBearer()
 
 router = APIRouter()

@@ -5,7 +5,7 @@ from src.users.routers.black_list.all_user_from_black_list import router as all_
 from src.users.routers.black_list.all_user  import router as all_user
 
 
-router = APIRouter(prefix="/black_list",  )
+router = APIRouter(prefix="/black_list", tags=["Black List"] )
 
 # Подключаем все подроутеры
 router.include_router(all_user)

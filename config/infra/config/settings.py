@@ -17,14 +17,16 @@ load_dotenv()
 # Определяем корневую директорию проекта и путь к .env
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-ENV_PATH = BASE_DIR / "src" / ".env"
-
+#ENV_PATH = BASE_DIR / "src" / ".env"
+ENV_PATH = BASE_DIR / "deploy" / ".env.development"
+#ENV_PATH = BASE_DIR / "src" / ".env.development"
 # загружаем .env
 load_dotenv(ENV_PATH)
-
+print(ENV_PATH)
 
 # --- BASE CLASS WITH CORRECT ENV PATH ---
 class BaseInfraSettings(BaseSettings):
+    print(ENV_PATH )
 
     # Убедитесь, что ENV_PATH корректно указывает на .env
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
@@ -72,6 +74,8 @@ class DatabaseSettings(BaseInfraSettings):
     PORT: int = 5432
     USER: Optional[str] = None
     PASSWORD: Optional[str] = None
+
+    #NAME: Optional[str] = None
     DB: Optional[str] = None
 
     ECHO: bool = False
@@ -88,6 +92,9 @@ class DatabaseSettings(BaseInfraSettings):
     @property
     def url(self) -> str:
         """Postgres if все переменные определены, иначе SQLite."""
+        print("DB USER:", self.USER)
+        print("DB NAME:", self.DB)
+        print("DB PASSWORD:", self.PASSWORD)
         if all([self.USER, self.PASSWORD, self.DB]):
             return (
                 f"postgresql+asyncpg://{self.USER}:{self.PASSWORD}@"
@@ -197,4 +204,5 @@ infra_settings = get_infra_settings()
 
 # Экспортируем вложенные объекты для удобства
 database_settings = infra_settings.db
+
 redis_settings = infra_settings.redis

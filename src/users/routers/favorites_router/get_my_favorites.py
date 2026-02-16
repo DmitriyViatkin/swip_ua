@@ -9,6 +9,12 @@ from src.users.schemas.favorite.favorite_read_sch import FavoriteRead
 from src.auth.dependencies import get_current_user
 from src.users.models.users import User
 from fastapi_pagination import  Page, paginate
+from src.users.models.users import User
+from  src.enums import UserRole
+from typing import Annotated
+from src.auth.role_dependencies import require_roles
+from src.auth.dependencies import get_current_user
+CurrentUser = Annotated[User, Depends(require_roles(UserRole.CLIENT, UserRole.ADMIN))]
 
 router = APIRouter( )
 
@@ -23,7 +29,7 @@ router = APIRouter( )
 @inject
 async def get_my_favorites(
         service: FromDishka[FavoritesService],
-        user: User = Depends(get_current_user),
+        user: CurrentUser,
 
 ):
     favorites = await service.get_my_favorites(user.id)

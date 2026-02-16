@@ -15,6 +15,8 @@ from src.users.schemas.notification.create import NotificationCreate
 from src.users.schemas.redirections import RedirectionCreate
 from src.auth.security.password import hash_password
 from src.enums import UserRole
+from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
 
 
 class UserService:
@@ -55,70 +57,86 @@ class UserService:
             notifications_data: Optional[List[NotificationCreate]] = None,
             redirections_data: Optional[List[RedirectionCreate]] = None,
     ) -> UserRead:
+
         data_dict = data.model_dump()
-
-
         data_dict["role"] = role
-
-
         data_dict["password"] = hash_password(data_dict["password"])
 
-        # Привязка к агенту (если есть)
         if agent_id is not None:
             data_dict["agent_id"] = agent_id
 
-        # Создаем пользователя
-        user = await self.user_repository.create(**data_dict)
+        try:
+            # ───────────── СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ ─────────────
+            user = await self.user_repository.create(**data_dict)
 
-        # ───────────── Подписка ─────────────
-        if subscription_data is None:
-            subscription_data = SubscriptionCreate(
-                user_id=user.id,
-                auto_renewal=True
+            # ───────────── ПОДПИСКА ─────────────
+            if subscription_data is None:
+                subscription_data = SubscriptionCreate(
+                    user_id=user.id,
+                    auto_renewal=True
+                )
+            else:
+                subscription_data.user_id = user.id
+
+            await self.subscription_repository.create(
+                **subscription_data.model_dump()
             )
-        else:
-            subscription_data.user_id = user.id
 
-        await self.subscription_repository.create(
-            **subscription_data.model_dump()
-        )
+            # ───────────── УВЕДОМЛЕНИЯ ─────────────
+            if not notifications_data:
+                default_notification = NotificationCreate(
+                    client_id=None,
+                    agent_id=None,
+                    is_me=False,
+                    is_me_agent=False,
+                    is_agent=False,
+                    turn_off=False,
+                    user_id=user.id,
+                )
+                await self.notification_repository.create(
+                    **default_notification.model_dump()
+                )
+            else:
+                for notification in notifications_data:
+                    notif_data = notification.model_dump()
+                    notif_data["user_id"] = user.id
+                    await self.notification_repository.create(**notif_data)
 
-        # ───────────── Уведомления ─────────────
-        if not notifications_data:
-            default_notification = NotificationCreate(
-                client_id=None,
-                agent_id=None,
-                is_me=False,
-                is_me_agent=False,
-                is_agent=False,
-                turn_off=False,
-                user_id=user.id,
+            # ───────────── РЕДИРЕКТЫ ─────────────
+            if not redirections_data:
+                default_redirection = RedirectionCreate(user_id=user.id)
+                await self.redirection_repository.create(
+                    **default_redirection.model_dump()
+                )
+            else:
+                for redirection in redirections_data:
+                    redir_data = redirection.model_dump()
+                    redir_data["user_id"] = user.id
+                    await self.redirection_repository.create(**redir_data)
+
+        except IntegrityError:
+            # ❗ ОБЯЗАТЕЛЬНО rollback
+            await self.user_repository.session.rollback()
+
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User with this email already exists"
             )
-            await self.notification_repository.create(
-                **default_notification.model_dump()
-            )
-        else:
-            for notification in notifications_data:
-                notif_data = notification.model_dump()
-                notif_data["user_id"] = user.id
-                await self.notification_repository.create(**notif_data)
 
-        # ───────────── Редиректы ─────────────
-        if not redirections_data:
-            default_redirection = RedirectionCreate(user_id=user.id)
-            await self.redirection_repository.create(
-                **default_redirection.model_dump()
+        except Exception:
+            await self.user_repository.session.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create user"
             )
-        else:
-            for redirection in redirections_data:
-                redir_data = redirection.model_dump()
-                redir_data["user_id"] = user.id
-                await self.redirection_repository.create(**redir_data)
 
-        # Загружаем пользователя со всеми связями
+        # ───────────── ПЕРЕЗАГРУЗКА ─────────────
         user = await self.user_repository.get_by_id(user.id)
         if not user:
-            raise ValueError("User not found after creation")
+            raise HTTPException(
+                status_code=500,
+                detail="User not found after creation"
+            )
 
         return UserRead.model_validate(user)
 

@@ -114,3 +114,66 @@ class GalleryImageRepository(BaseRepository[GalleryImage]):
 
         await session.flush()
 
+import base64
+import binascii
+import uuid
+from pathlib import Path
+from fastapi import HTTPException
+
+
+async def save_gallery_with_images(
+        *,
+        session,
+        owner_id: int,
+        owner_type: str,  # "advert" | "house"
+        images,
+        gallery_service,
+        gallery_image_service,
+        gallery_id: int | None = None  # ← передаем существующую галерею
+):
+    if not images:
+        return None
+
+    # Если передан gallery_id, берём существующую галерею
+    if gallery_id:
+        gallery = await gallery_service.get_by_id(session, gallery_id)
+        if not gallery:
+            raise HTTPException(404, "Gallery not found")
+    else:
+        gallery = await gallery_service.create(session, {})  # создаём новую
+
+    # Директория для сохранения файлов
+    base_dir = Path("media") / owner_type / str(owner_id)
+    base_dir.mkdir(parents=True, exist_ok=True)
+
+    for idx, image in enumerate(images):
+        raw = image.base64.strip()
+
+        # Определяем расширение
+        if raw.startswith("data:image/"):
+            header, raw = raw.split(",", 1)
+            ext = header.split("/")[1].split(";")[0]
+        else:
+            ext = "jpg"
+
+        try:
+            image_bytes = base64.b64decode(raw, validate=True)
+        except binascii.Error:
+            raise HTTPException(400, "Invalid base64 image")
+
+        filename = f"{uuid.uuid4()}.{ext}"
+        filepath = base_dir / filename
+
+        with open(filepath, "wb") as f:
+            f.write(image_bytes)
+
+        await gallery_image_service.create(
+            session,
+            {
+                "gallery_id": gallery.id,
+                "image": f"{owner_type}/{owner_id}/{filename}",
+                "position": image.position or idx,
+            },
+        )
+
+    return gallery

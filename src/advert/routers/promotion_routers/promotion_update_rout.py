@@ -1,9 +1,13 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from dishka.integrations.fastapi import FromDishka, inject
 
 from src.advert.services.promotion_serv import PromotionService
 from src.advert.schemas.promotion.promotion_read_sch import PromotionRead
 from src.advert.schemas.promotion.promotion_update_sch import PromotionUpdate
+from src.auth.dependencies import get_current_user
+from src.users.models.users import User
+from typing import Annotated
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 router = APIRouter( )
 
@@ -12,6 +16,7 @@ router = APIRouter( )
 @inject
 async def update_promotion(
     advert_id: int,
+        user: CurrentUser,
     data: PromotionUpdate,
     service: FromDishka[PromotionService],
 ):

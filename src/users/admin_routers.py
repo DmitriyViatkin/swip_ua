@@ -5,8 +5,8 @@ from .routers.black_list.all_router_black_list import router as blacklist
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
-# Подключаем все подроутеры
+
 
 router.include_router(notary)
-router.include_router(blacklist)
+#router.include_router(blacklist)
 

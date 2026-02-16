@@ -2,7 +2,9 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dishka.integrations.fastapi import FromDishka, inject
 from src.users.schemas.user.user_read import UserRead
+from src.auth.role_dependencies import require_roles
 from src.auth.dependencies import get_current_user
+from  src.enums import UserRole
 from src.auth.services.auth_service import AuthService
 from src.users.models.users import User
 from src.building.services.infrastructure import InfrastructureService
@@ -24,7 +26,7 @@ async def update_infrastructure(
     service: FromDishka[InfrastructureService],
     # Добавляем сессию из Dishka
     session: FromDishka[AsyncSession],
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_roles(UserRole.DEV)),
 ):
     infrastructure = await service.update_or_create(
         session=session,

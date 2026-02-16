@@ -1,10 +1,17 @@
 # src/building/routers/chessboard.py
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from dishka.integrations.fastapi import FromDishka, inject
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.auth.role_dependencies import require_roles
+from src.auth.dependencies import get_current_user
+from  src.enums import UserRole
+from src.users.models.users import User
+from typing import Annotated
 
 from src.building.schemas.chessboard_sch import ChessboardRow
 from src.building.services.chessboard_service import ChessboardService
+
+CurrentUser = Annotated[User, Depends(require_roles(UserRole.DEV))]
 
 router = APIRouter(prefix="/chessboard"  )
 
@@ -16,7 +23,8 @@ router = APIRouter(prefix="/chessboard"  )
 @inject
 async def get_chessboard(
     section_id: int,
-        house_id:int,
+    house_id:int,
+    user: CurrentUser,
     session: FromDishka[AsyncSession],
     service: FromDishka[ChessboardService],
 ):
