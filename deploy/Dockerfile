@@ -16,7 +16,7 @@ RUN poetry config virtualenvs.create false
 RUN poetry self add poetry-plugin-export
 
 # Копируем зависимости **относительно корня проекта**
-COPY ./pyproject.toml poetry.lock ./
+COPY pyproject.toml poetry.lock ./
 
 RUN poetry export -f requirements.txt --without-hashes -o requirements.txt && \
     pip install --no-cache-dir -r requirements.txt && \
