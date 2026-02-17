@@ -14,10 +14,10 @@ class Advert(Base):
     __tablename__ = "adverts"
 
     # PK
-    id = Column(Integer, primary_key=True, index=True)  # AutoField -> Integer, PK
+    id = Column(Integer, primary_key=True, index=True)
 
     # Fields
-    address = Column(String)  # CharField -> String
+    address = Column(String)
 
     # Enum Fields
     appointment = Column(Enum(AppointmentEnum), nullable=False)

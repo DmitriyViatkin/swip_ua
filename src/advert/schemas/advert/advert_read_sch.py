@@ -35,8 +35,33 @@ class AdvertRead(BaseModel):
     is_approved: bool
     is_active: bool
 
-    
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "address": "г.Киев, ул. Вайбкодера 1",
+                "appointment": "Апартаменты",
+                "layout": "санузел+ туалет",
+                "state": "handed over",
+                "heating": "Централизованное",
+                "payment": "user",
+                "communication": "user",
+                "rooms": 2,
+                "area": 55.50,
+                "kitchen_area": 12.00,
+                "is_balcony": False,
+                "commission": 500.00,
+                "price": 15000.00,
+                "description": "Класна квартира",
+                "build_id": 1,
+                "is_approved": True,
+                "is_active": True,
+                "gallery": {"id": 1, "images": []},
+                "promotion": None
+            }
+        }
+    )
 
 class AdvertList(BaseModel):
         items: List[AdvertRead]

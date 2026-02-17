@@ -1,5 +1,5 @@
 import base64
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from .infrastructure import InfrastructureRead
 from .news import NewsRead
 from .registration_and_payment import RegistrationPaymentRead
@@ -11,18 +11,16 @@ from .document import DocumentRead
 
 from typing import Optional, List
 
+
 class HouseBase(BaseModel):
     information: str | None = None
     latitude: str | None = None
     longitude: str | None = None
 
 
-
 class HouseCreate(HouseBase):
     user_id: int
     images: list[ImageWithPosition] | None = None
-
-
 
 
 class HouseRead(HouseBase):
@@ -38,17 +36,48 @@ class HouseRead(HouseBase):
 
     gallery: Optional[GalleryRead] = None
 
-    model_config = {
-        "from_attributes": True
-    }
+    # Використовуємо ConfigDict для Pydantic v2
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "user_id": 10,
+                "information": "ЖК 'Сучасний', преміум клас",
+                "latitude": "50.4501",
+                "longitude": "30.5234",
+                "infrastructure": None,
+                "registration_and_payment": None,
+                "sales_department": None,
+                "news": [],
+                "documents": [],
+                "add_excell": [],
+                "gallery": {
+                    "id": 1,
+                    "images": [
+                        {"id": 1, "url": "http://example.com/img.jpg", "position": 1}
+                    ]
+                }
+            }
+        }
+    )
 
-
-    model_config = {
-        "from_attributes": True,
-    }
 
 class HouseUpsert(BaseModel):
-    information: str| None = None
-    latitude: str| None = None
-    longitude: str| None = None
+    information: str | None = None
+    latitude: str | None = None
+    longitude: str | None = None
     images: list[ImageWithPosition] | None = None
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "information": "Оновлена інформація про будинок",
+                "latitude": "50.4501",
+                "longitude": "30.5234",
+                "images": [
+                    {"image_id": 0, "base64": "string", "position": 0, "is_delete": False}
+                ]
+            }
+        }
+    )
