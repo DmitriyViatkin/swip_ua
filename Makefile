@@ -12,7 +12,7 @@ COMPOSE = docker compose $(COMPOSE_PATH)
 # Полный цикл запуска приложения (используется в Docker командой CMD/ENTRYPOINT)
 start:
 	poetry run alembic upgrade head
-	poetry run uvicorn config.app:app --host 0.0.0.0 --port 8000 --reload
+	poetry run uvicorn config.app:app --host 0.0.0.0 --port 8000
 
 # Запуск только API
 api:
