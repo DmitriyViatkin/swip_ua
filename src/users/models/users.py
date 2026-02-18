@@ -44,7 +44,7 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
-    # Остальные связи остаются как были
+
     houses = relationship("House", back_populates="user", cascade="all, delete-orphan")
     black_list = relationship("BlackList", back_populates="user", cascade="all, delete-orphan")
     filters = relationship("Filter", back_populates="user", cascade="all, delete-orphan")

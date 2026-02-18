@@ -193,7 +193,7 @@ class UserService:
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        if user.is_verified:
+        if user.is_email_verified:
             raise HTTPException(status_code=400, detail="Email already verified")
 
         return user
