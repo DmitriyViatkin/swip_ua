@@ -154,8 +154,8 @@ class CelerySettings(BaseInfraSettings):
         "env_prefix": "CELERY_",
     }
 
-    BROKER_URL: Optional[str] = None
-    RESULT_BACKEND: Optional[str] = None
+    BROKER_URL: str ="redis://redis:6379/0"
+    RESULT_BACKEND:str = "redis://redis:6379/1"
     TASK_SERIALIZER: str = "json"
     RESULT_SERIALIZER: str = "json"
     ACCEPT_CONTENT: list[str] = ["json"]
