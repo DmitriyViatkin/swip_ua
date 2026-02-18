@@ -16,10 +16,10 @@ from src.auth.role_dependencies import require_roles
 bearer_scheme = HTTPBearer()
 router = APIRouter()
 
-@router.get("/all_dev", response_model=List[UserRead,UserRole.CLIENT])
+@router.get("/all_dev", response_model=List[UserRead])
 @inject
 async def get_all_notary(
-        current_user: User = Depends(require_roles(UserRole.DEV)),
+        current_user: User = Depends(require_roles(UserRole.DEV,UserRole.CLIENT)),
         user_service: FromDishka[UserService] = Depends(),
 ):
     return await user_service.get_all_users(role=UserRole.DEV)
