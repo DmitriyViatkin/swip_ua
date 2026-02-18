@@ -12,7 +12,7 @@ from src.auth.dependencies import get_current_user
 from  src.enums import UserRole
 from src.users.models.users import User
 from typing import Annotated
-CurrentUser = Annotated[User, Depends(require_roles(UserRole.DEV))]
+CurrentUser = Annotated[User, Depends(require_roles(UserRole.DEV,UserRole.CLIENT))]
 
 from src.building.services.chessboard_service import ChessboardService
 

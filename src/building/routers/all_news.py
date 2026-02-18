@@ -24,7 +24,7 @@ async def get_house_news(
     session: FromDishka[AsyncSession],
     news_service: FromDishka[NewsService],
     house_service: FromDishka[HouseService],
-    current_user: User = Depends(require_roles(UserRole.DEV)),
+    current_user: User = Depends(require_roles(UserRole.DEV,UserRole.CLIENT)),
 ):
     # 1. Проверяем дом
     house = await house_service.get_by_id(session, house_id)

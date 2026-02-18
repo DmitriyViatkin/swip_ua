@@ -17,7 +17,7 @@ async def get_house(
         house_id: int,
         session: FromDishka[AsyncSession],
         house_service: FromDishka[HouseService],
-        current_user: User = Depends(require_roles(UserRole.DEV)),
+        current_user: User = Depends(require_roles(UserRole.DEV,UserRole.CLIENT)),
 ):
     # 1️⃣ получаем дом с selectinload всех связанных сущностей
     house = await house_service.get_by_id(session=session, pk=house_id)
@@ -25,9 +25,8 @@ async def get_house(
     if not house:
         raise HTTPException(status_code=404, detail="House not found")
 
-    # 2️⃣ проверяем, что дом принадлежит текущему пользователю
+
     if house.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Forbidden")
 
-    # 3️⃣ возвращаем полностью загруженный объект
     return house

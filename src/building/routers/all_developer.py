@@ -16,7 +16,7 @@ from src.auth.role_dependencies import require_roles
 bearer_scheme = HTTPBearer()
 router = APIRouter()
 
-@router.get("/all_dev", response_model=List[UserRead])
+@router.get("/all_dev", response_model=List[UserRead,UserRole.CLIENT])
 @inject
 async def get_all_notary(
         current_user: User = Depends(require_roles(UserRole.DEV)),

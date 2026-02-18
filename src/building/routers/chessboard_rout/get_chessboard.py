@@ -11,7 +11,7 @@ from typing import Annotated
 from src.building.schemas.chessboard_sch import ChessboardRow
 from src.building.services.chessboard_service import ChessboardService
 
-CurrentUser = Annotated[User, Depends(require_roles(UserRole.DEV))]
+CurrentUser = Annotated[User, Depends(require_roles(UserRole.DEV,UserRole.CLIENT))]
 
 router = APIRouter(prefix="/chessboard"  )
 
