@@ -48,7 +48,7 @@ class RedisSettings(BaseInfraSettings):
         env_prefix="REDIS_"
     )
 
-    HOST: str = "localhost"
+    HOST: str = "redis"
     PORT: int = 6379
     PASSWORD: Optional[str] = None
     DB: int = 0
@@ -154,13 +154,25 @@ class CelerySettings(BaseInfraSettings):
         "env_prefix": "CELERY_",
     }
 
-    BROKER_URL: str = "redis://localhost:6379/0"
-    RESULT_BACKEND: str = "redis://localhost:6379/1"
+    BROKER_URL: Optional[str] = None
+    RESULT_BACKEND: Optional[str] = None
     TASK_SERIALIZER: str = "json"
     RESULT_SERIALIZER: str = "json"
     ACCEPT_CONTENT: list[str] = ["json"]
     TIMEZONE: str = "UTC"
     ENABLE_UTC: bool = True
+
+    @property
+    def broker_url(self) -> str:
+        if self.BROKER_URL:
+            return self.BROKER_URL
+        return redis_settings.url
+
+    @property
+    def result_backend(self) -> str:
+        if self.RESULT_BACKEND:
+            return self.RESULT_BACKEND
+        return redis_settings.url
 
 
 
