@@ -57,7 +57,12 @@ class AdvertRead(BaseModel):
                 "build_id": 1,
                 "is_approved": True,
                 "is_active": True,
-                "gallery": {"id": 1, "images": []},
+                "gallery": {
+                    "id": 1,
+                    "images": [
+                        {"id": 1, "url": "http://example.com/img.jpg", "position": 1}
+                    ]
+                },
                 "promotion": None
             }
         }

@@ -36,7 +36,7 @@ class HouseRead(HouseBase):
 
     gallery: Optional[GalleryRead] = None
 
-    # Використовуємо ConfigDict для Pydantic v2
+
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={
