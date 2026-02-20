@@ -69,7 +69,12 @@ class AdvertBase(BaseModel):
                 "commission": 500.00,
                 "rooms": 2,
                 "build_id": 1,
-                "images": []
+                "gallery": {
+                    "id": 1,
+                    "images": [
+                        {"id": 1, "url": "http://example.com/img.jpg", "position": 1}
+                    ]
+                }
             }
         }
     }
