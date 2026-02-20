@@ -19,11 +19,13 @@ class UserRepository:
             select(User)
             .options(
                 selectinload(User.agent),
-                selectinload(User.clients),
+                # Завантажуємо клієнтів ТА їхні підписки одним махом
+                selectinload(User.clients).selectinload(User.subscription),
+                # Також завантажуємо клієнтів для цих клієнтів (якщо це передбачено схемою UserRead)
+                selectinload(User.clients).selectinload(User.clients),
                 selectinload(User.subscription),
                 selectinload(User.client_notifications),
                 selectinload(User.redirections),
-
             )
             .where(User.id == user_id)
         )
