@@ -8,11 +8,11 @@ from src.enums import (
                 AppointmentEnum,LayoutEnum,StateEnum,HeatingEnum,
                 PaymentPartyEnum,CommunicationPartyEnum
 )
-from src.advert.schemas.image_sch import ImageWithPosition
+
 class AdvertCreate(AdvertBase):
 
     build_id: int = Field(..., gt=0)
-    images: list[ImageWithPosition] | None = None
+
 
     @classmethod
     def as_form(
