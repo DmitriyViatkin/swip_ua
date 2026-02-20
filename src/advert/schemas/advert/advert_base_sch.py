@@ -60,17 +60,17 @@ class AdvertBase(BaseModel):
     description: Optional[str] = None
     model_config = {
         "json_schema_extra": {
-            "example": [
-                {
-                    "address": "г.Киев, ул. Вайбкодера 1",
-                    "appointment": "Апартаменты",
-                    "price": 15000.00,
-                    "area": 55.50,
-                    "kitchen_area": 12.00,
-                    "commission": 500.00,
-                    "rooms": 2
-                }
-            ]
+            "example": {  # Прибрали [ ]
+                "address": "г.Киев, ул. Вайбкодера 1",
+                "appointment": "Апартаменты",
+                "price": 15000.00,
+                "area": 55.50,
+                "kitchen_area": 12.00,
+                "commission": 500.00,
+                "rooms": 2,
+                "build_id": 1,
+                "images": []
+            }
         }
     }
     # gallery: GalleryRead  | None
