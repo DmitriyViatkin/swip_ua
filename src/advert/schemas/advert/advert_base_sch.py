@@ -53,14 +53,14 @@ class AdvertBase(BaseModel):
     price: Decimal = Field(
         ...,
         gt=0,
-        max_digits=12,  # Максимум 999,999,999,9.99
+        max_digits=12,
         decimal_places=2,
         examples=[15000.00]
     )
     description: Optional[str] = None
     model_config = {
         "json_schema_extra": {
-            "example": {  # Прибрали [ ]
+            "example": {
                 "address": "г.Киев, ул. Вайбкодера 1",
                 "appointment": "Апартаменты",
                 "price": 15000.00,
@@ -78,7 +78,7 @@ class AdvertBase(BaseModel):
             }
         }
     }
-    # gallery: GalleryRead  | None
+
     @field_validator('price', 'area', 'kitchen_area', 'commission', mode='after')
     @classmethod
     def format_decimal(cls, v):
