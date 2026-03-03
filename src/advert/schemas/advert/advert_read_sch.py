@@ -1,6 +1,6 @@
 #src/advert/schemas/advert/advert_read_sch.py
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from decimal import Decimal
 from typing import Optional, List
 from ..gallery_image_sch import GalleryImageRead
@@ -14,7 +14,7 @@ from src.enums import (
 class AdvertRead(BaseModel):
     id: int
     address: str
-
+    build_id: int = Field(..., gt=0, description="ID дома или объекта строительства")
     appointment: AppointmentEnum
     layout: Optional[LayoutEnum]
     state: Optional[StateEnum]

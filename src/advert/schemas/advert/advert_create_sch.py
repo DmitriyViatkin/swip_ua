@@ -17,6 +17,7 @@ class AdvertCreate(AdvertBase):
     @classmethod
     def as_form(
             cls,
+            
             address: str = Form(...),
             appointment: AppointmentEnum = Form(...),
             price: Decimal = Form(...),
