@@ -1,6 +1,6 @@
 #src/advert/schemas/advert/advert_update_sch.py
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from decimal import Decimal
 from fastapi import Form
@@ -11,6 +11,7 @@ from src.enums import (
 
 class AdvertUpdate(BaseModel):
 
+    build_id: int = Field(..., gt=0, description="ID дома или объекта строительства")
     address: Optional[str]=None
 
     appointment: Optional[AppointmentEnum] = None
