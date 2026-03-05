@@ -20,7 +20,8 @@ class AdvertUpdate(BaseModel):
     heating: Optional[HeatingEnum] = None
     payment: Optional[PaymentPartyEnum] = None
     communication: Optional[CommunicationPartyEnum] = None
-
+    latitude: Optional[float] = Field(None, examples=[50.4501])
+    longitude: Optional[float] = Field(None, examples=[30.5234])
     rooms: Optional[int] = None
     area: Optional[Decimal] = None
     kitchen_area: Optional[Decimal] = None
