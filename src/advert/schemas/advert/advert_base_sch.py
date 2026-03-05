@@ -20,7 +20,8 @@ class AdvertBase(BaseModel):
     heating: Optional[HeatingEnum] =None
     payment: Optional[PaymentPartyEnum]=None
     communication: Optional[CommunicationPartyEnum]=None
-
+    latitude: Optional[float] = Field(None, examples=[50.4501])
+    longitude: Optional[float] = Field(None, examples=[30.5234])
     rooms: Optional[int] = Field(
         None,
         ge=0,
@@ -104,6 +105,8 @@ class AdvertBase(BaseModel):
             commission: Optional[Decimal] = Form(None),
             description: Optional[str] = Form(None),
             price: Decimal = Form(...),
+            latitude: Optional[float] = Form(None),
+            longitude: Optional[float] = Form(None),
             build_id: int = Form(...),
     ):
         return cls(**locals())

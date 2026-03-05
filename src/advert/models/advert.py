@@ -27,7 +27,8 @@ class Advert(Base):
     payment = Column(Enum(PaymentPartyEnum))
     communication = Column(Enum(CommunicationPartyEnum))
 
-    # Other Fields
+    latitude = Column(Float, nullable=True)  # Широта
+    longitude = Column(Float, nullable=True)
     rooms = Column(Integer)
     area = Column(Float)
     kitchen_area = Column(Float)
