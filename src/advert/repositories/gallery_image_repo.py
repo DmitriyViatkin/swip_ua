@@ -1,7 +1,13 @@
 from src.building.repositories.base import BaseRepository
+from pathlib import Path
 
 from sqlalchemy.orm import selectinload
 
+import base64
+import binascii
+import uuid
+from pathlib import Path
+from fastapi import HTTPException
 
 from sqlalchemy import update, case, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -114,11 +120,7 @@ class GalleryImageRepository(BaseRepository[GalleryImage]):
 
         await session.flush()
 
-import base64
-import binascii
-import uuid
-from pathlib import Path
-from fastapi import HTTPException
+
 
 
 async def save_gallery_with_images(
@@ -143,7 +145,7 @@ async def save_gallery_with_images(
         gallery = await gallery_service.create(session, {})  # создаём новую
 
     # Директория для сохранения файлов
-    base_dir = Path("media") / owner_type / str(owner_id)
+    base_dir = Path("/app/media") / owner_type / str(owner_id)
     base_dir.mkdir(parents=True, exist_ok=True)
 
     for idx, image in enumerate(images):

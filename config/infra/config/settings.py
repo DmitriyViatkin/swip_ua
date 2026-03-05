@@ -28,7 +28,7 @@ print(ENV_PATH)
 class BaseInfraSettings(BaseSettings):
     print(ENV_PATH )
 
-    # Убедитесь, что ENV_PATH корректно указывает на .env
+
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_file=str(ENV_PATH),
         env_file_encoding="utf-8",
