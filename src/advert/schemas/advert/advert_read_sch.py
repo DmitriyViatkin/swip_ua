@@ -21,7 +21,8 @@ class AdvertRead(BaseModel):
     heating: Optional[HeatingEnum]
     payment: Optional[PaymentPartyEnum]
     communication: Optional[CommunicationPartyEnum]
-
+    latitude: Optional[float] = Field(None, examples=[50.4501])
+    longitude: Optional[float] = Field(None, examples=[30.5234])
     rooms: Optional[int]
     area: Optional[Decimal]
     kitchen_area: Optional[Decimal]
@@ -41,6 +42,8 @@ class AdvertRead(BaseModel):
             "example": {
                 "id": 1,
                 "address": "г.Киев, ул. Вайбкодера 1",
+               "latitude": 50.4501,
+    "longitude":  0.5234,
                 "appointment": "Апартаменты",
                 "layout": "санузел+ туалет",
                 "state": "handed over",
