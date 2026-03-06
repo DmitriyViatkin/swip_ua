@@ -17,8 +17,8 @@ load_dotenv()
 # Определяем корневую директорию проекта и путь к .env
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-ENV_PATH = BASE_DIR / "src" / ".env"
-#ENV_PATH = BASE_DIR / "deploy" / ".env.development"
+#ENV_PATH = BASE_DIR / "src" / ".env"
+ENV_PATH = BASE_DIR / "deploy" / ".env.development"
 #ENV_PATH = BASE_DIR / "src" / ".env.development"
 # загружаем .env
 load_dotenv(ENV_PATH)
