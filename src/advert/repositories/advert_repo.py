@@ -237,4 +237,17 @@ class AdvertRepository(BaseRepository[Advert]):
         result = await self.session.execute(stmt)
         return result.scalars().unique().all()
 
+    async def get_by_user(self, user_id: int) -> list[Advert]:
+        stmt = (
+            select(Advert)
+            .where(Advert.user_id == user_id)
+            .options(
+                selectinload(Advert.gallery).selectinload(Gallery.images),
+                selectinload(Advert.promotion),
+            )
+            .order_by(desc(Advert.id))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
 

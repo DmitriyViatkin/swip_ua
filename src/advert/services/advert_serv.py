@@ -22,6 +22,9 @@ class AdvertService:
         await self.session.commit()
         return advert
 
+    async def get_by_user(self, user_id: int):
+        return await self.repo.get_by_user(user_id)
+    
     async def get_by_id(self, advert_id: int):
         return await self.repo.get_by_id(advert_id)
 

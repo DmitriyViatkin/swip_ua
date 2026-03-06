@@ -42,7 +42,8 @@ class Advert(Base):
     is_active = Column(Boolean, default=False)
     gallery_id = Column(Integer, ForeignKey("galleries.id"), nullable=True)
     gallery = relationship("Gallery")
-
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user = relationship("User", back_populates="adverts")
     build_id = Column(Integer, ForeignKey("houses.id"), nullable=False)
 
 

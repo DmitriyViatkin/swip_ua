@@ -64,5 +64,6 @@ class User(Base):
     )
     is_email_verified = Column(Boolean, default=False)
     is_blacklisted = Column(Boolean, default=False)
+    adverts = relationship("Advert", back_populates="user")
     favorites = relationship("Favorite", back_populates="user", cascade="all, delete-orphan")
     complaints = relationship("Complaint", back_populates="author", cascade="all, delete-orphan")

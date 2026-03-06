@@ -65,17 +65,15 @@ class UtilityBillsChoice(str, Enum):
 
 
 class AppointmentEnum(str, Enum):
-    APARTMENTS = "Апартаменты"
-    FLAT = "Квартира"
-    HOUSE = "Дом"
-    STUDIO = "Студия"
-
+    APARTMENTS = "apartments"
+    FLAT = "flat"
+    HOUSE = "house"
+    STUDIO = "studio"
 
 
 class LayoutEnum(str, Enum):
-    JOINT = "санузел+ туалет"
-    SEPARATE = "Сан узел и туалет роздельно"
-
+    JOINT = "joint"
+    SEPARATE = "separate"
 
 
 class StateEnum(str, Enum):
@@ -83,11 +81,10 @@ class StateEnum(str, Enum):
     PIT = "pit"
 
 
-
 class HeatingEnum(str, Enum):
-    CENTRALIZED = "Централизованное"
-    AUTONOMOUS = "Автономное"
-    INDIVIDUAL = "Индивидуальное"
+    CENTRALIZED = "centralized"
+    AUTONOMOUS = "autonomous"
+    INDIVIDUAL = "individual"
 
 
 
