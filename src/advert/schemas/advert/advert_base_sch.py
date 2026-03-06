@@ -13,7 +13,7 @@ from .. gallery_sch import GalleryRead
 class AdvertBase(BaseModel):
     build_id: int = Field(..., gt=0, description="ID дома или объекта строительства")
     address: str = Field(..., examples=["г.Киев, ул. Вайбкодера 1"])
-
+    user_id: int = Field(..., gt=0)
     appointment: AppointmentEnum
     layout: Optional[LayoutEnum] = None
     state: Optional[StateEnum] = None

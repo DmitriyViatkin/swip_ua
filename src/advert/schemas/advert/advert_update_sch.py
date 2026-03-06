@@ -11,6 +11,7 @@ from src.enums import (
 
 class AdvertUpdate(BaseModel):
 
+    user_id: int = Field(..., gt=0)
     build_id: int = Field(..., gt=0, description="ID дома или объекта строительства")
     address: Optional[str]=None
 

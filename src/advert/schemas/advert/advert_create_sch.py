@@ -12,7 +12,7 @@ from src.enums import (
 class AdvertCreate(AdvertBase):
 
     build_id: int = Field(..., gt=0)
-
+    user_id: int = Field(..., gt=0)
 
     @classmethod
     def as_form(
